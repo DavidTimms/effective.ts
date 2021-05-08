@@ -10,7 +10,7 @@ export default interface IO<A, E = Error> {
 
   andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E>;
 
-  unsafeRun(): Promise<A>;
+  run(): Promise<A>;
 }
 
 class Wrap<A, E = Error> implements IO<A, E> {
@@ -18,7 +18,7 @@ class Wrap<A, E = Error> implements IO<A, E> {
 
   constructor(private readonly value: A) {}
 
-  async unsafeRun(): Promise<A> {
+  async run(): Promise<A> {
     return this.value;
   }
 
@@ -32,7 +32,7 @@ class Defer<A, E = Error> implements IO<A, E> {
 
   constructor(private readonly effect: () => Promise<A> | A) {}
 
-  async unsafeRun(): Promise<A> {
+  async run(): Promise<A> {
     const effect = this.effect;
     return effect();
   }
@@ -47,8 +47,16 @@ class AndThen<A, B, E = Error> implements IO<B, E> {
 
   constructor(readonly io: IO<A, E>, readonly nextIo: (a: A) => IO<B, E>) {}
 
-  async unsafeRun(): Promise<B> {
-    return unsafeRun(this);
+  async run(): Promise<B> {
+    let io: IO<B, E> = this;
+
+    // Trampoline the andThen operation to ensure stack safety
+    while (io.type === IOType.AndThen) {
+      const { nextIo, io: parent } = io as AndThen<A, B, E>;
+      const a = await parent.run();
+      io = nextIo(a);
+    }
+    return io.run();
   }
 
   andThen<C>(nextIo: (a: B) => IO<C, E>): IO<C, E> {
@@ -61,23 +69,13 @@ class Raise<E> implements IO<never, E> {
 
   constructor(private readonly error: E) {}
 
-  async unsafeRun(): Promise<never> {
+  async run(): Promise<never> {
     throw this.error;
   }
 
   andThen(): IO<never, E> {
     return this;
   }
-}
-
-async function unsafeRun<A, B, E>(io: IO<B, E>): Promise<B> {
-  // Trampoline the andThen operation to ensure stack safety
-  while (io.type === IOType.AndThen) {
-    const { nextIo, io: parent } = io as AndThen<A, B, E>;
-    const a = await unsafeRun(parent);
-    io = nextIo(a);
-  }
-  return io.unsafeRun();
 }
 
 export default function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
