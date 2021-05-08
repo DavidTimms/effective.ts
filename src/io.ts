@@ -1,14 +1,14 @@
 enum IOType {
   Wrap,
   Defer,
-  FlatMap,
+  AndThen,
   Raise,
 }
 
 export default interface IO<A, E = Error> {
   type: IOType;
 
-  flatMap<B>(nextIo: (a: A) => IO<B, E>): IO<B, E>;
+  andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E>;
 
   unsafeRun(): Promise<A>;
 }
@@ -22,8 +22,8 @@ class Wrap<A, E = Error> implements IO<A, E> {
     return this.value;
   }
 
-  flatMap<B>(nextIo: (a: A) => IO<B, E>): IO<B, E> {
-    return new FlatMap(this, nextIo);
+  andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E> {
+    return new AndThen(this, nextIo);
   }
 }
 
@@ -37,13 +37,13 @@ class Defer<A, E = Error> implements IO<A, E> {
     return effect();
   }
 
-  flatMap<B>(nextIo: (a: A) => IO<B, E>): IO<B, E> {
-    return new FlatMap(this, nextIo);
+  andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E> {
+    return new AndThen(this, nextIo);
   }
 }
 
-class FlatMap<A, B, E = Error> implements IO<B, E> {
-  readonly type = IOType.FlatMap;
+class AndThen<A, B, E = Error> implements IO<B, E> {
+  readonly type = IOType.AndThen;
 
   constructor(readonly io: IO<A, E>, readonly nextIo: (a: A) => IO<B, E>) {}
 
@@ -51,8 +51,8 @@ class FlatMap<A, B, E = Error> implements IO<B, E> {
     return unsafeRun(this);
   }
 
-  flatMap<C>(nextIo: (a: B) => IO<C, E>): IO<C, E> {
-    return new FlatMap(this, nextIo);
+  andThen<C>(nextIo: (a: B) => IO<C, E>): IO<C, E> {
+    return new AndThen(this, nextIo);
   }
 }
 
@@ -65,15 +65,15 @@ class Raise<E> implements IO<never, E> {
     throw this.error;
   }
 
-  flatMap(): IO<never, E> {
+  andThen(): IO<never, E> {
     return this;
   }
 }
 
 async function unsafeRun<A, B, E>(io: IO<B, E>): Promise<B> {
-  // Trampoline the flatMap operation to ensure stack safety
-  while (io.type === IOType.FlatMap) {
-    const { nextIo, io: parent } = io as FlatMap<A, B, E>;
+  // Trampoline the andThen operation to ensure stack safety
+  while (io.type === IOType.AndThen) {
+    const { nextIo, io: parent } = io as AndThen<A, B, E>;
     const a = await unsafeRun(parent);
     io = nextIo(a);
   }
