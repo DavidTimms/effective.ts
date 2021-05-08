@@ -1,0 +1,12 @@
+- [x] make recursive IO stack-safe
+- [ ] use union instead of interface for IO
+- [ ] add tests (property-based tests for monad laws?)
+- [x] change then method to flatMap
+- [x] support async
+- [ ] add map method
+- [ ] correct type restrictions on errors
+- [x] lift function to return IO
+- [ ] sequence and parallel functions
+- [ ] optimise to avoid creation of unnecessary promises
+- [ ] Cancellation
+- [ ] Fibers

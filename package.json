@@ -1,0 +1,31 @@
+{
+  "devDependencies": {
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4",
+    "prettier": "^2.2.1"
+  },
+  "name": "effective",
+  "description": "An idiomatic IO monad for TypeScript",
+  "version": "0.0.1",
+  "main": "dist/io.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidTimms/effective.git"
+  },
+  "keywords": [
+    "io",
+    "monad",
+    "pure",
+    "functional",
+    "concurrency"
+  ],
+  "author": "David Timms",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/DavidTimms/effective/issues"
+  },
+  "homepage": "https://github.com/DavidTimms/effective#readme"
+}
