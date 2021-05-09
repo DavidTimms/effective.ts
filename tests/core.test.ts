@@ -26,6 +26,13 @@ describe("The main IO function", () => {
         return expect(IO(effect).run()).rejects.toBe(thrownValue);
       })
     ));
+  it("creates an IO which waits for a promise returned by the effect", () =>
+    fc.assert(
+      fc.asyncProperty(fc.anything(), (eventualValue) => {
+        const effect = () => Promise.resolve(eventualValue);
+        return expect(IO(effect).run()).resolves.toBe(eventualValue);
+      })
+    ));
 });
 
 describe("The IO.wrap function", () => {
