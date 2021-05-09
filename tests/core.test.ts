@@ -1,5 +1,6 @@
 import fc from "fast-check";
 import IO from "../src/io";
+import { range } from "./utils";
 
 describe("The main IO function", () => {
   it("creates an IO which performs the side-effect when run", () =>
@@ -51,4 +52,26 @@ describe("The IO.raise function", () => {
         expect(IO.raise(raisedValue).run()).rejects.toBe(raisedValue)
       )
     ));
+});
+
+describe("The andThen method", () => {
+  it("passes the output of the parent IO to the next function", () =>
+    fc.assert(
+      fc.asyncProperty(fc.anything(), async (initialValue) => {
+        const nextFunction = jest.fn(() => IO.void);
+        await IO.wrap(initialValue).andThen(nextFunction).run();
+        expect(nextFunction).toHaveBeenCalledTimes(1);
+        expect(nextFunction).toHaveBeenCalledWith(initialValue);
+      })
+    ));
+  it("can be used to define recursive functions without causing a stack overflow", () => {
+    function sum(numbers: number[], index = 0, total = 0): IO<number> {
+      if (index >= numbers.length) return IO.wrap(total);
+      return IO.wrap(total + numbers[index]).andThen((total) =>
+        sum(numbers, index + 1, total)
+      );
+    }
+
+    expect(sum(range(100000)).run()).resolves.toBe(4999950000);
+  });
 });

@@ -8,7 +8,7 @@ enum IOType {
 export default interface IO<A, E = Error> {
   type: IOType;
 
-  andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E>;
+  andThen<B>(next: (a: A) => IO<B, E>): IO<B, E>;
 
   run(): Promise<A>;
 }
@@ -22,8 +22,8 @@ class Wrap<A, E = Error> implements IO<A, E> {
     return this.value;
   }
 
-  andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E> {
-    return new AndThen(this, nextIo);
+  andThen<B>(next: (a: A) => IO<B, E>): IO<B, E> {
+    return new AndThen(this, next);
   }
 }
 
@@ -37,30 +37,30 @@ class Defer<A, E = Error> implements IO<A, E> {
     return effect();
   }
 
-  andThen<B>(nextIo: (a: A) => IO<B, E>): IO<B, E> {
-    return new AndThen(this, nextIo);
+  andThen<B>(next: (a: A) => IO<B, E>): IO<B, E> {
+    return new AndThen(this, next);
   }
 }
 
 class AndThen<A, B, E = Error> implements IO<B, E> {
   readonly type = IOType.AndThen;
 
-  constructor(readonly io: IO<A, E>, readonly nextIo: (a: A) => IO<B, E>) {}
+  constructor(readonly parent: IO<A, E>, readonly next: (a: A) => IO<B, E>) {}
 
   async run(): Promise<B> {
     let io: IO<B, E> = this;
 
     // Trampoline the andThen operation to ensure stack safety
     while (io.type === IOType.AndThen) {
-      const { nextIo, io: parent } = io as AndThen<A, B, E>;
+      const { next, parent } = io as AndThen<A, B, E>;
       const a = await parent.run();
-      io = nextIo(a);
+      io = next(a);
     }
     return io.run();
   }
 
-  andThen<C>(nextIo: (a: B) => IO<C, E>): IO<C, E> {
-    return new AndThen(this, nextIo);
+  andThen<C>(next: (a: B) => IO<C, E>): IO<C, E> {
+    return new AndThen(this, next);
   }
 }
 
