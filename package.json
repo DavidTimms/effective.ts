@@ -12,7 +12,8 @@
   "version": "0.0.1",
   "main": "dist/io.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "prettier --check '**.ts'"
   },
   "repository": {
     "type": "git",
