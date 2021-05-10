@@ -1,9 +1,8 @@
 - [x] make recursive IO stack-safe
-- [ ] use union instead of interface for IO
-- [ ] add tests (property-based tests for monad laws?)
+- [x] add tests (property-based tests for monad laws?)
 - [x] change then method to flatMap
 - [x] support async
-- [ ] map method
+- [X] map method
 - [ ] correct type restrictions on errors
 - [x] lift function to return IO
 - [ ] sequence and parallel functions

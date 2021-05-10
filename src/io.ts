@@ -1,4 +1,5 @@
 export default interface IO<A, E = Error> {
+  map<B>(mapping: (a: A) => B): IO<B, E>;
   andThen<B>(next: (a: A) => IO<B, E>): IO<B, E>;
   run(): Promise<A>;
 }
@@ -13,6 +14,8 @@ class Wrap<A, E = Error> implements IO<A, E> {
   andThen<B>(next: (a: A) => IO<B, E>): IO<B, E> {
     return new AndThen(this, next);
   }
+
+  map = map;
 }
 
 class Defer<A, E = Error> implements IO<A, E> {
@@ -26,6 +29,8 @@ class Defer<A, E = Error> implements IO<A, E> {
   andThen<B>(next: (a: A) => IO<B, E>): IO<B, E> {
     return new AndThen(this, next);
   }
+
+  map = map;
 }
 
 class AndThen<A, B, E = Error> implements IO<B, E> {
@@ -46,6 +51,8 @@ class AndThen<A, B, E = Error> implements IO<B, E> {
   andThen<C>(next: (a: B) => IO<C, E>): IO<C, E> {
     return new AndThen(this, next);
   }
+
+  map = map;
 }
 
 class Raise<E> implements IO<never, E> {
@@ -58,10 +65,16 @@ class Raise<E> implements IO<never, E> {
   andThen(): IO<never, E> {
     return this;
   }
+
+  map = map;
 }
 
 export default function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(effect);
+}
+
+function map<A, B, E>(this: IO<A, E>, mapping: (a: A) => B): IO<B, E> {
+  return this.andThen((a) => IO.wrap(mapping(a)));
 }
 
 function wrap<A, E = Error>(value: A): IO<A, E> {
