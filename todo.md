@@ -3,10 +3,15 @@
 - [ ] add tests (property-based tests for monad laws?)
 - [x] change then method to flatMap
 - [x] support async
-- [ ] add map method
+- [ ] map method
 - [ ] correct type restrictions on errors
 - [x] lift function to return IO
 - [ ] sequence and parallel functions
+- [ ] repeat method
+- [ ] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
 - [ ] optimise to avoid creation of unnecessary promises
 - [ ] Cancellation
+- [ ] timeout method (implement in terms of `IO.race`?)
+- [ ] retry method
+- [ ] race function
 - [ ] Fibers
