@@ -1,21 +1,9 @@
-enum IOType {
-  Wrap,
-  Defer,
-  AndThen,
-  Raise,
-}
-
 export default interface IO<A, E = Error> {
-  type: IOType;
-
   andThen<B>(next: (a: A) => IO<B, E>): IO<B, E>;
-
   run(): Promise<A>;
 }
 
 class Wrap<A, E = Error> implements IO<A, E> {
-  readonly type = IOType.Wrap;
-
   constructor(private readonly value: A) {}
 
   async run(): Promise<A> {
@@ -28,8 +16,6 @@ class Wrap<A, E = Error> implements IO<A, E> {
 }
 
 class Defer<A, E = Error> implements IO<A, E> {
-  readonly type = IOType.Defer;
-
   constructor(private readonly effect: () => Promise<A> | A) {}
 
   async run(): Promise<A> {
@@ -43,16 +29,14 @@ class Defer<A, E = Error> implements IO<A, E> {
 }
 
 class AndThen<A, B, E = Error> implements IO<B, E> {
-  readonly type = IOType.AndThen;
-
   constructor(readonly parent: IO<A, E>, readonly next: (a: A) => IO<B, E>) {}
 
   async run(): Promise<B> {
     let io: IO<B, E> = this;
 
     // Trampoline the andThen operation to ensure stack safety
-    while (io.type === IOType.AndThen) {
-      const { next, parent } = io as AndThen<A, B, E>;
+    while (io instanceof AndThen) {
+      const { next, parent } = io;
       const a = await parent.run();
       io = next(a);
     }
@@ -65,8 +49,6 @@ class AndThen<A, B, E = Error> implements IO<B, E> {
 }
 
 class Raise<E> implements IO<never, E> {
-  readonly type = IOType.Raise;
-
   constructor(private readonly error: E) {}
 
   async run(): Promise<never> {
