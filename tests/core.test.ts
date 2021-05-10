@@ -18,6 +18,7 @@ describe("The main IO function", () => {
         return expect(result).resolves.toBe(effectResult);
       })
     ));
+
   it("creates an IO which rejects when run if the side-effect throws", () =>
     fc.assert(
       fc.asyncProperty(fc.anything(), (thrownValue) => {
@@ -27,6 +28,7 @@ describe("The main IO function", () => {
         return expect(IO(effect).run()).rejects.toBe(thrownValue);
       })
     ));
+
   it("creates an IO which waits for a promise returned by the effect", () =>
     fc.assert(
       fc.asyncProperty(fc.anything(), (eventualValue) => {
@@ -64,6 +66,7 @@ describe("The andThen method", () => {
         expect(nextFunction).toHaveBeenCalledWith(initialValue);
       })
     ));
+
   it("can be used to define recursive functions without causing a stack overflow", () => {
     function sum(numbers: number[], index = 0, total = 0): IO<number> {
       if (index >= numbers.length) return IO.wrap(total);
@@ -73,5 +76,45 @@ describe("The andThen method", () => {
     }
 
     expect(sum(range(100000)).run()).resolves.toBe(4999950000);
+  });
+
+  it("allows sequencing async effects", async () => {
+    const events = [];
+
+    const firstEffect = async () => {
+      events.push("start first effect");
+      await new Promise((r) => setTimeout(r, 30));
+      events.push("finish first effect");
+    };
+
+    const secondEffect = () => {
+      events.push("start second effect");
+      events.push("finish second effect");
+    };
+
+    const thirdEffect = async () => {
+      events.push("start third effect");
+      await new Promise((r) => setTimeout(r, 30));
+      events.push("finish third effect");
+    };
+
+    const io = IO(firstEffect)
+      .andThen(() => IO(secondEffect))
+      .andThen(() => IO(thirdEffect));
+
+    events.push("start run");
+    await io.run();
+    events.push("finish run");
+
+    expect(events).toEqual([
+      "start run",
+      "start first effect",
+      "finish first effect",
+      "start second effect",
+      "finish second effect",
+      "start third effect",
+      "finish third effect",
+      "finish run",
+    ]);
   });
 });
