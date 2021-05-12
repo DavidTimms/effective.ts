@@ -1,24 +1,30 @@
-export default interface IO<A, E = Error> {
+type IO<A, E = unknown> =
+  | Wrap<A, E>
+  | Defer<A, E>
+  | AndThen<A, E, any, E>
+  | Raise<A, E>;
+
+interface IOInterface<A, E = unknown> {
   map<B>(mapping: (a: A) => B): IO<B, E>;
-  andThen<B>(next: (a: A) => IO<B, E>): IO<B, E>;
+  andThen<B, E2>(next: (a: A) => IO<B, E2>): IO<B, E | E2>;
   run(): Promise<A>;
 }
 
-class Wrap<A, E = Error> implements IO<A, E> {
+class Wrap<A, E> implements IOInterface<A, E> {
   constructor(private readonly value: A) {}
 
   async run(): Promise<A> {
     return this.value;
   }
 
-  andThen<B>(next: (a: A) => IO<B, E>): IO<B, E> {
+  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
     return new AndThen(this, next);
   }
 
   map = map;
 }
 
-class Defer<A, E = Error> implements IO<A, E> {
+class Defer<A, E> implements IOInterface<A, E> {
   constructor(private readonly effect: () => Promise<A> | A) {}
 
   async run(): Promise<A> {
@@ -26,50 +32,56 @@ class Defer<A, E = Error> implements IO<A, E> {
     return effect();
   }
 
-  andThen<B>(next: (a: A) => IO<B, E>): IO<B, E> {
+  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
     return new AndThen(this, next);
   }
 
   map = map;
 }
 
-class AndThen<A, B, E = Error> implements IO<B, E> {
-  constructor(readonly parent: IO<A, E>, readonly next: (a: A) => IO<B, E>) {}
+class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
+  constructor(
+    readonly parent: IO<ParentA, ParentE>,
+    readonly next: (parentA: ParentA) => IO<A, E>
+  ) {}
 
-  async run(): Promise<B> {
-    let io: IO<B, E> = this;
+  async run(): Promise<A> {
+    // TODO attempt to find a way to implement this function
+    //      with type safety.
 
-    // Trampoline the andThen operation to ensure stack safety
+    let io: IO<A, E> = this;
+
+    // Trampoline the andThen operation to ensure stack safety.
     while (io instanceof AndThen) {
-      const { next, parent } = io;
-      const a = await parent.run();
-      io = next(a);
+      const { next, parent } = io as AndThen<any, any, any, any>;
+      const parentA = await parent.run();
+      io = next(parentA);
     }
     return io.run();
   }
 
-  andThen<C>(next: (a: B) => IO<C, E>): IO<C, E> {
-    return new AndThen(this, next);
+  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
+    return new AndThen<B, E | E2, A, E>(this, next);
   }
 
   map = map;
 }
 
-class Raise<E> implements IO<never, E> {
+class Raise<A, E> implements IOInterface<A, E> {
   constructor(private readonly error: E) {}
 
   async run(): Promise<never> {
     throw this.error;
   }
 
-  andThen(): IO<never, E> {
-    return this;
+  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
+    return (this as unknown) as IO<B, E>;
   }
 
   map = map;
 }
 
-export default function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
+function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(effect);
 }
 
@@ -77,11 +89,11 @@ function map<A, B, E>(this: IO<A, E>, mapping: (a: A) => B): IO<B, E> {
   return this.andThen((a) => IO.wrap(mapping(a)));
 }
 
-function wrap<A, E = Error>(value: A): IO<A, E> {
+function wrap<A>(value: A): IO<A, never> {
   return new Wrap(value);
 }
 
-function raise<E = Error>(error: E): IO<never, E> {
+function raise<E>(error: E): IO<never, E> {
   return new Raise(error);
 }
 
@@ -95,3 +107,5 @@ IO.wrap = wrap;
 IO.raise = raise;
 IO.lift = lift;
 IO.void = IO.wrap(undefined);
+
+export default IO;

@@ -6,6 +6,7 @@
 - [ ] correct type restrictions on errors
 - [x] lift function to return IO
 - [ ] sequence and parallel functions
+- [ ] forEach method (and parallel equivalent)
 - [ ] repeat method
 - [ ] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
 - [ ] optimise to avoid creation of unnecessary promises
