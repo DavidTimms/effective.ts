@@ -118,3 +118,7 @@ describe("The andThen method", () => {
     ]);
   });
 });
+
+describe("The catch method", () => {
+  it.todo("works");
+});
