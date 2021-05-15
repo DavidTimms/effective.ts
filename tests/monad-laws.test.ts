@@ -18,7 +18,7 @@ describe("The IO type is a valid monad", () => {
 
   it("obeys the law that `wrap` is a right-identity for `andThen`", () =>
     fc.assert(
-      fc.asyncProperty(arbitraries.io, async (io) => {
+      fc.asyncProperty(arbitraries.successfulIo, async (io) => {
         const andThenWithWrap = io.andThen((a) => IO.wrap(a));
         expect(await andThenWithWrap.run()).toEqual(await io.run());
       })
@@ -27,7 +27,7 @@ describe("The IO type is a valid monad", () => {
   it("obeys the law that bind is associative", () =>
     fc.assert(
       fc.asyncProperty(
-        arbitraries.io,
+        arbitraries.successfulIo,
         arbitraries.unaryFunction.map(IO.lift),
         arbitraries.unaryFunction.map(IO.lift),
         async (io, f, g) => {

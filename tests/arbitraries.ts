@@ -1,7 +1,9 @@
 import fc, { Arbitrary } from "fast-check";
 import IO from "../src/io";
 
-export const io: Arbitrary<IO<unknown>> = fc
+export const successfulIo: Arbitrary<
+  IO<unknown>
+> = fc
   .anything()
   .chain((value) =>
     fc.oneof(
@@ -10,6 +12,25 @@ export const io: Arbitrary<IO<unknown>> = fc
       fc.constant(IO.void.andThen(() => IO.wrap(value)))
     )
   );
+
+export const unsuccessfulIo: Arbitrary<IO<unknown>> = fc
+  .anything()
+  .chain((error) =>
+    fc.oneof(
+      fc.constant(IO.raise(error)),
+      fc.constant(IO.void.andThen(() => IO.raise(error))),
+      fc.constant(
+        IO(() => {
+          throw error;
+        })
+      )
+    )
+  );
+
+export const io: Arbitrary<IO<unknown>> = fc.oneof(
+  successfulIo,
+  unsuccessfulIo
+);
 
 export const unaryFunction: Arbitrary<
   (y: unknown) => unknown

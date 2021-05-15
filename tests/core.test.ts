@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import IO from "../src/io";
 import { range } from "./utils";
+import * as arbitraries from "./arbitraries";
 
 describe("The main IO function", () => {
   it("creates an IO which performs the side-effect when run", () =>
@@ -120,5 +121,60 @@ describe("The andThen method", () => {
 });
 
 describe("The catch method", () => {
-  it.todo("works");
+  it("makes no difference to IOs which succeed", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.successfulIo, async (successfulIo) => {
+        const withCatch = successfulIo.catch(() => IO.wrap("caught an error"));
+        expect(await withCatch.run()).toEqual(await successfulIo.run());
+      })
+    ));
+
+  it("can always turn an unsuccessful IO into a successful one", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.unsuccessfulIo, async (unsuccessfulIo) => {
+        const withCatch = unsuccessfulIo.catch(() =>
+          IO.wrap("caught an error")
+        );
+        expect(await withCatch.run()).toBe("caught an error");
+      })
+    ));
+
+  it("makes no differences if it re-raises the error unchanged", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.io, async (io) => {
+        const withCatch = io.catch(IO.raise);
+        expect(await withCatch.runSafe()).toEqual(await io.runSafe());
+      })
+    ));
+
+  it("catches errors previously raised", () => {
+    const io = IO.raise("the roof").catch((errorMessage) =>
+      IO.wrap("Raised " + errorMessage + "!")
+    );
+
+    return expect(io.run()).resolves.toBe("Raised the roof!");
+  });
+
+  it("catches errors thrown in deferred effects", () => {
+    const io = IO(() => {
+      throw "some shapes";
+    }).catch((errorMessage) => IO.wrap("Threw " + errorMessage + "!"));
+
+    return expect(io.run()).resolves.toBe("Threw some shapes!");
+  });
+
+  it(
+    "Only catches exceptions raised or thrown in deferred effects , " +
+      "not `andThen` functions",
+    () => {
+      const error = Error("errors should be raised, not thrown");
+      const io = IO.void
+        .andThen(() => {
+          throw error;
+        })
+        .catch((e) => e);
+
+      return expect(io.run()).rejects.toBe(error);
+    }
+  );
 });
