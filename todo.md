@@ -4,7 +4,7 @@
 - [x] support async
 - [X] map method
 - [X] catch method
-- [ ] mapError method
+- [X] mapError method
 - [ ] Support for partial functions in catch and andThen?
 - [X] correct type restrictions on errors
 - [x] lift function to return IO
