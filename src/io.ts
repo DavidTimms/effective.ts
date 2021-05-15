@@ -17,6 +17,7 @@ type IOResult<A, E> =
 interface IOInterface<A, E = unknown> {
   map<B>(mapping: (a: A) => B): IO<B, E>;
   andThen<B, E2>(next: (a: A) => IO<B, E2>): IO<B, E | E2>;
+  mapError<E2>(mapping: (e: E) => E2): IO<A, E2>;
   catch<B, E2>(catcher: (e: E) => IO<B, E2>): IO<A | B, E2>;
   run(): Promise<A>;
   runSafe(): Promise<IOResult<A, E>>;
@@ -37,9 +38,9 @@ class Wrap<A, E> implements IOInterface<A, E> {
     return new AndThen<B, E | E2, A, E>(this, next);
   }
 
-  map = map;
-
-  catch = catchMethod;
+  map = methods.map;
+  mapError = methods.mapError;
+  catch = methods.catch;
 }
 
 class Defer<A, E> implements IOInterface<A, E> {
@@ -64,9 +65,9 @@ class Defer<A, E> implements IOInterface<A, E> {
     return new AndThen<B, E | E2, A, E>(this, next);
   }
 
-  map = map;
-
-  catch = catchMethod;
+  map = methods.map;
+  mapError = methods.mapError;
+  catch = methods.catch;
 }
 
 class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
@@ -111,9 +112,9 @@ class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
     return new AndThen<B, E | E2, A, E>(this, next);
   }
 
-  map = map;
-
-  catch = catchMethod;
+  map = methods.map;
+  mapError = methods.mapError;
+  catch = methods.catch;
 }
 
 class Raise<A, E> implements IOInterface<A, E> {
@@ -131,9 +132,9 @@ class Raise<A, E> implements IOInterface<A, E> {
     return (this as unknown) as IO<B, E>;
   }
 
-  map = map;
-
-  catch = catchMethod;
+  map = methods.map;
+  mapError = methods.mapError;
+  catch = methods.catch;
 }
 
 class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
@@ -166,25 +167,31 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
     return new AndThen<B, E | E2, A, E>(this, next);
   }
 
-  map = map;
-
-  catch = catchMethod;
+  map = methods.map;
+  mapError = methods.mapError;
+  catch = methods.catch;
 }
 
 function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(effect);
 }
 
-function map<A, B, E>(this: IO<A, E>, mapping: (a: A) => B): IO<B, E> {
-  return this.andThen((a) => IO.wrap(mapping(a)));
-}
+const methods = {
+  map<A, B, E>(this: IO<A, E>, mapping: (a: A) => B): IO<B, E> {
+    return this.andThen((a) => IO.wrap(mapping(a)));
+  },
 
-function catchMethod<ParentA, ParentE, CaughtA, CaughtE>(
-  this: IO<ParentA, ParentE>,
-  catcher: (e: ParentE) => IO<CaughtA, CaughtE>
-): IO<ParentA | CaughtA, CaughtE> {
-  return new Catch(this, catcher);
-}
+  mapError<A, E, E2>(this: IO<A, E>, mapping: (e: E) => E2): IO<A, E2> {
+    return this.catch((e) => IO.raise(mapping(e)));
+  },
+
+  catch<ParentA, ParentE, CaughtA, CaughtE>(
+    this: IO<ParentA, ParentE>,
+    catcher: (e: ParentE) => IO<CaughtA, CaughtE>
+  ): IO<ParentA | CaughtA, CaughtE> {
+    return new Catch(this, catcher);
+  },
+};
 
 function wrap<A>(value: A): IO<A, never> {
   return new Wrap(value);
@@ -194,6 +201,7 @@ function raise<E>(error: E): IO<never, E> {
   return new Raise(error);
 }
 
+// TODO rename this function?
 function lift<Args extends unknown[], Return>(
   func: (...args: Args) => Promise<Return> | Return
 ): (...args: Args) => IO<Return> {
