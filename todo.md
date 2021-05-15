@@ -3,7 +3,10 @@
 - [x] change then method to flatMap
 - [x] support async
 - [X] map method
-- [ ] correct type restrictions on errors
+- [X] catch method
+- [ ] mapError method
+- [ ] Support for partial functions in catch and andThen?
+- [X] correct type restrictions on errors
 - [x] lift function to return IO
 - [ ] sequence and parallel functions
 - [ ] forEach method (and parallel equivalent)
