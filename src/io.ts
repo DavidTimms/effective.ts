@@ -208,9 +208,50 @@ function lift<Args extends unknown[], Return>(
   return (...args) => IO(() => func(...args));
 }
 
+type IOArray = readonly IO<unknown, unknown>[];
+
+type ExtractError<Action extends IO<unknown, unknown>> = Action extends IO<
+  unknown,
+  infer E
+>
+  ? E
+  : never;
+
+type UnionOfErrors<Actions extends IOArray> = ExtractError<Actions[number]>;
+
+type ExtractResult<Action> = Action extends IO<infer A, unknown> ? A : never;
+
+type Sequenced<Actions extends IOArray> = {
+  [I in keyof Actions]: ExtractResult<Actions[I]>;
+};
+
+function sequence<Actions extends IOArray>(
+  actions: Actions
+): IO<Sequenced<Actions>, UnionOfErrors<Actions>> {
+  return sequenceFrom(actions, 0, [] as const);
+}
+
+function sequenceFrom<Actions extends IOArray>(
+  actions: Actions,
+  index: number,
+  results: readonly unknown[]
+): IO<Sequenced<Actions>, UnionOfErrors<Actions>> {
+  // TODO find a more type-safe way to express this function.
+
+  if (index >= actions.length) {
+    return IO.wrap(results as Sequenced<Actions>);
+  } else {
+    const action = actions[index] as IO<unknown, UnionOfErrors<Actions>>;
+    return action.andThen((result) =>
+      sequenceFrom(actions, index + 1, results.concat([result]))
+    );
+  }
+}
+
 IO.wrap = wrap;
 IO.raise = raise;
 IO.lift = lift;
-IO.void = IO.wrap(undefined);
+IO.void = IO.wrap<void>(undefined);
+IO.sequence = sequence;
 
 export default IO;
