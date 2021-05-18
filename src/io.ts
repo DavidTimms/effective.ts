@@ -221,13 +221,18 @@ type UnionOfErrors<Actions extends IOArray> = ExtractError<Actions[number]>;
 
 type ExtractResult<Action> = Action extends IO<infer A, unknown> ? A : never;
 
-type Sequenced<Actions extends IOArray> = {
+type ResultsArray<Actions extends IOArray> = {
   [I in keyof Actions]: ExtractResult<Actions[I]>;
 };
 
+/**
+ * Creates an IO from an array of IOs, which will perform
+ * the actions sequentially, returning an array of the results,
+ * or stopping on the first error encountered.
+ */
 function sequence<Actions extends IOArray>(
   actions: Actions
-): IO<Sequenced<Actions>, UnionOfErrors<Actions>> {
+): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
   return sequenceFrom(actions, 0, [] as const);
 }
 
@@ -235,11 +240,11 @@ function sequenceFrom<Actions extends IOArray>(
   actions: Actions,
   index: number,
   results: readonly unknown[]
-): IO<Sequenced<Actions>, UnionOfErrors<Actions>> {
+): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
   // TODO find a more type-safe way to express this function.
 
   if (index >= actions.length) {
-    return IO.wrap(results as Sequenced<Actions>);
+    return IO.wrap(results as ResultsArray<Actions>);
   } else {
     const action = actions[index] as IO<unknown, UnionOfErrors<Actions>>;
     return action.andThen((result) =>
@@ -248,10 +253,35 @@ function sequenceFrom<Actions extends IOArray>(
   }
 }
 
+function parallel<Actions extends IOArray>(
+  actions: Actions
+): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
+  // TODO should return when first error occurs, rather than waiting for them all.
+  return IO(() => Promise.all(actions.map((io) => io.runSafe())))
+    .catch(
+      (unsoundlyThrownError): IO<never, never> => {
+        throw unsoundlyThrownError;
+      }
+    )
+    .andThen((safeResults) => {
+      const succeeded = [];
+      for (let i = 0; i < safeResults.length; i++) {
+        const safeResult = safeResults[i];
+        if (safeResult.outcome === IOOutcome.Succeeded) {
+          succeeded.push(safeResult.value);
+        } else {
+          return IO.raise(safeResult.value as UnionOfErrors<Actions>);
+        }
+      }
+      return IO.wrap((succeeded as unknown) as ResultsArray<Actions>);
+    });
+}
+
 IO.wrap = wrap;
 IO.raise = raise;
 IO.lift = lift;
 IO.void = IO.wrap<void>(undefined);
 IO.sequence = sequence;
+IO.parallel = parallel;
 
 export default IO;
