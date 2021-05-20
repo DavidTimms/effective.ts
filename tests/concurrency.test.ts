@@ -40,7 +40,7 @@ describe("The IO.parallel function", () => {
       fc.asyncProperty(fc.array(successfulIo), async (actions) => {
         const allResults = await Promise.all(actions.map((io) => io.run()));
         const parallelized = await IO.parallel(actions).run();
-        return expect(parallelized).toEqual(allResults);
+        expect(parallelized).toEqual(allResults);
       })
     ));
 
@@ -79,5 +79,26 @@ describe("The IO.parallel function", () => {
 
     await expect(parallelWithCatch.run()).rejects.toEqual(SyntaxError());
     expect(catcher).toHaveBeenCalledTimes(0);
+  });
+
+  it("rejects as soon as the first effect fails, without waiting for the others", async () => {
+    // This test currently causes jest to print a warning because the
+    // timer in the slow action is not cancelled, causing the process
+    // to stay active after the test run has finished. This should be
+    // resolved once the system supports cancellation.
+    const events: Array<string> = [];
+
+    const failsSlowly = IO.sleep(30000)
+      .andThen(() => IO(() => events.push("long sleep is over")))
+      .andThen(() => IO.raise(Error("failed slowly")));
+
+    const failsQuickly = IO.sleep(10)
+      .andThen(() => IO(() => events.push("short sleep is over")))
+      .andThen(() => IO.raise(Error("failed quickly")));
+
+    const inParallel = IO.parallel([failsSlowly, failsQuickly]);
+
+    await expect(inParallel.run()).rejects.toEqual(Error("failed quickly"));
+    expect(events).toEqual(["short sleep is over"]);
   });
 });

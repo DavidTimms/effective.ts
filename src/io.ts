@@ -253,28 +253,69 @@ function sequenceFrom<Actions extends IOArray>(
   }
 }
 
+/**
+ * Creates an IO from an array of IOs, which will perform
+ * the actions concurrently, returning an array of the results,
+ * or stopping when the first error occurs.
+ */
 function parallel<Actions extends IOArray>(
   actions: Actions
 ): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
-  // TODO should return when first error occurs, rather than waiting for them all.
-  return IO(() => Promise.all(actions.map((io) => io.runSafe())))
+  return IO(
+    () =>
+      new Promise<Array<IOResult<unknown, unknown>>>((resolve, reject) => {
+        if (actions.length === 0) {
+          resolve([]);
+        }
+
+        // As each action completes, it writes its result to the corresponding
+        // index in this array.
+        const safeResults = Array<IOResult<unknown, unknown>>(actions.length);
+        // This count is used to determine when all actions have completed.
+        let resolvedCount = 0;
+
+        for (let i = 0; i < actions.length; i++) {
+          actions[i].runSafe().then((safeResult) => {
+            safeResults[i] = safeResult;
+            resolvedCount += 1;
+            if (
+              safeResult.outcome === IOOutcome.Raised ||
+              resolvedCount === actions.length
+            ) {
+              // Either all actions have completed successfully, or one of
+              // them has raised, so we resolve the promise.
+
+              // eventually it should cancel the outstanding actions here.
+              resolve(safeResults);
+            }
+          }, reject);
+        }
+      })
+  )
     .catch(
       (unsoundlyThrownError): IO<never, never> => {
+        // The promise above never intentionally rejects, so an error
+        // here means an error was thrown outside of the IO system.
         throw unsoundlyThrownError;
       }
     )
     .andThen((safeResults) => {
       const succeeded = [];
-      for (let i = 0; i < safeResults.length; i++) {
-        const safeResult = safeResults[i];
-        if (safeResult.outcome === IOOutcome.Succeeded) {
-          succeeded.push(safeResult.value);
-        } else {
-          return IO.raise(safeResult.value as UnionOfErrors<Actions>);
+      for (const safeResult of safeResults) {
+        if (safeResult !== undefined) {
+          if (safeResult.outcome === IOOutcome.Succeeded) {
+            succeeded.push(safeResult.value);
+          } else {
+            return IO.raise(safeResult.value as UnionOfErrors<Actions>);
+          }
         }
       }
       return IO.wrap((succeeded as unknown) as ResultsArray<Actions>);
     });
+}
+
+function sleep(milliseconds: number): IO<void> {
+  return IO(() => new Promise((resolve) => setTimeout(resolve, milliseconds)));
 }
 
 IO.wrap = wrap;
@@ -283,5 +324,6 @@ IO.lift = lift;
 IO.void = IO.wrap<void>(undefined);
 IO.sequence = sequence;
 IO.parallel = parallel;
+IO.sleep = sleep;
 
 export default IO;
