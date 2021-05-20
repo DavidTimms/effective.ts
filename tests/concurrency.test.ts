@@ -88,11 +88,11 @@ describe("The IO.parallel function", () => {
     // resolved once the system supports cancellation.
     const events: Array<string> = [];
 
-    const failsSlowly = IO.sleep(30000)
+    const failsSlowly = IO.wait(30, "seconds")
       .andThen(() => IO(() => events.push("long sleep is over")))
       .andThen(() => IO.raise(Error("failed slowly")));
 
-    const failsQuickly = IO.sleep(10)
+    const failsQuickly = IO.wait(10, "milliseconds")
       .andThen(() => IO(() => events.push("short sleep is over")))
       .andThen(() => IO.raise(Error("failed quickly")));
 
@@ -100,5 +100,23 @@ describe("The IO.parallel function", () => {
 
     await expect(inParallel.run()).rejects.toEqual(Error("failed quickly"));
     expect(events).toEqual(["short sleep is over"]);
+  });
+});
+
+describe("The repeatForever method", () => {
+  it("returns an IO which repeats the action infinitely", async () => {
+    let performedCount = 0;
+
+    const infinite = IO(() => (performedCount += 1))
+      .andThen(() => IO.wait(100, "milliseconds"))
+      .repeatForever();
+
+    const withTimeout = IO.parallel([
+      infinite,
+      IO.wait(350, "milliseconds").andThen(() => IO.raise("time's up")),
+    ]);
+
+    await expect(withTimeout.run()).rejects.toEqual("time's up");
+    expect(performedCount).toBe(4);
   });
 });

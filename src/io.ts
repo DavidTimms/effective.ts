@@ -21,6 +21,7 @@ interface IOInterface<A, E = unknown> {
   catch<B, E2>(catcher: (e: E) => IO<B, E2>): IO<A | B, E2>;
   run(): Promise<A>;
   runSafe(): Promise<IOResult<A, E>>;
+  repeatForever(): IO<never, E>;
 }
 
 class Wrap<A, E> implements IOInterface<A, E> {
@@ -41,6 +42,7 @@ class Wrap<A, E> implements IOInterface<A, E> {
   map = methods.map;
   mapError = methods.mapError;
   catch = methods.catch;
+  repeatForever = methods.repeatForever;
 }
 
 class Defer<A, E> implements IOInterface<A, E> {
@@ -68,6 +70,7 @@ class Defer<A, E> implements IOInterface<A, E> {
   map = methods.map;
   mapError = methods.mapError;
   catch = methods.catch;
+  repeatForever = methods.repeatForever;
 }
 
 class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
@@ -115,6 +118,7 @@ class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
   map = methods.map;
   mapError = methods.mapError;
   catch = methods.catch;
+  repeatForever = methods.repeatForever;
 }
 
 class Raise<A, E> implements IOInterface<A, E> {
@@ -135,6 +139,7 @@ class Raise<A, E> implements IOInterface<A, E> {
   map = methods.map;
   mapError = methods.mapError;
   catch = methods.catch;
+  repeatForever = methods.repeatForever;
 }
 
 class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
@@ -170,6 +175,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
   map = methods.map;
   mapError = methods.mapError;
   catch = methods.catch;
+  repeatForever = methods.repeatForever;
 }
 
 function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
@@ -190,6 +196,10 @@ const methods = {
     catcher: (e: ParentE) => IO<CaughtA, CaughtE>
   ): IO<ParentA | CaughtA, CaughtE> {
     return new Catch(this, catcher);
+  },
+
+  repeatForever<A, E>(this: IO<A, E>): IO<never, E> {
+    return this.andThen(() => this.repeatForever());
   },
 };
 
@@ -314,7 +324,21 @@ function parallel<Actions extends IOArray>(
     });
 }
 
-function sleep(milliseconds: number): IO<void> {
+const TIME_UNIT_FACTORS = {
+  millisecond: 1,
+  milliseconds: 1,
+  seconds: 1000,
+  second: 1000,
+  minute: 60000,
+  minutes: 60000,
+  hour: 3600000,
+  hours: 3600000,
+};
+
+type TimeUnits = keyof typeof TIME_UNIT_FACTORS;
+
+function wait(time: number, units: TimeUnits): IO<void> {
+  const milliseconds = time * TIME_UNIT_FACTORS[units];
   return IO(() => new Promise((resolve) => setTimeout(resolve, milliseconds)));
 }
 
@@ -324,6 +348,6 @@ IO.lift = lift;
 IO.void = IO.wrap<void>(undefined);
 IO.sequence = sequence;
 IO.parallel = parallel;
-IO.sleep = sleep;
+IO.wait = wait;
 
 export default IO;

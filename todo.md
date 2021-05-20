@@ -8,10 +8,10 @@
 - [ ] Support for partial functions in catch and andThen?
 - [X] correct type restrictions on errors
 - [x] lift function to return IO
-- [ ] sequence and parallel functions
+- [x] sequence and parallel functions
 - [ ] forEach method (and parallel equivalent)
-- [ ] repeat method
-- [ ] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
+- [x] repeatForever method
+- [x] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
 - [ ] optimise to avoid creation of unnecessary promises
 - [ ] Cancellation
 - [ ] timeout method (implement in terms of `IO.race`?)
