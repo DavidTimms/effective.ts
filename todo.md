@@ -9,12 +9,13 @@
 - [X] correct type restrictions on errors
 - [x] lift function to return IO
 - [x] sequence and parallel functions
+- [ ] race function
 - [ ] forEach method (and parallel equivalent)
 - [x] repeatForever method
 - [x] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
 - [ ] optimise to avoid creation of unnecessary promises
-- [ ] Cancellation
 - [ ] timeout method (implement in terms of `IO.race`?)
 - [ ] retry method
-- [ ] race function
+- [ ] Cancellation
 - [ ] Fibers
+- [ ] some more helper methods for composing independent IOs and returning the first or second value
