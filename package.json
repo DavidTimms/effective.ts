@@ -12,7 +12,7 @@
   "version": "0.0.1",
   "main": "dist/io.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit",
     "lint": "prettier --check '**.ts'"
   },
   "repository": {
