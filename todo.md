@@ -9,7 +9,7 @@
 - [X] correct type restrictions on errors
 - [x] lift function to return IO
 - [x] sequence and parallel functions
-- [ ] race function
+- [x] race function
 - [ ] forEach method (and parallel equivalent)
 - [x] repeatForever method
 - [x] wait function e.g. `.andThen(IO.wait(5, "seconds"))`

@@ -22,6 +22,7 @@ interface IOInterface<A, E = unknown> {
   run(): Promise<A>;
   runSafe(): Promise<IOResult<A, E>>;
   repeatForever(): IO<never, E>;
+  delay(time: number, units: TimeUnits): IO<A, E>;
 }
 
 class Wrap<A, E> implements IOInterface<A, E> {
@@ -43,6 +44,7 @@ class Wrap<A, E> implements IOInterface<A, E> {
   mapError = methods.mapError;
   catch = methods.catch;
   repeatForever = methods.repeatForever;
+  delay = methods.delay;
 }
 
 class Defer<A, E> implements IOInterface<A, E> {
@@ -71,6 +73,7 @@ class Defer<A, E> implements IOInterface<A, E> {
   mapError = methods.mapError;
   catch = methods.catch;
   repeatForever = methods.repeatForever;
+  delay = methods.delay;
 }
 
 class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
@@ -119,6 +122,7 @@ class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
   mapError = methods.mapError;
   catch = methods.catch;
   repeatForever = methods.repeatForever;
+  delay = methods.delay;
 }
 
 class Raise<A, E> implements IOInterface<A, E> {
@@ -140,6 +144,7 @@ class Raise<A, E> implements IOInterface<A, E> {
   mapError = methods.mapError;
   catch = methods.catch;
   repeatForever = methods.repeatForever;
+  delay = methods.delay;
 }
 
 class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
@@ -176,6 +181,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
   mapError = methods.mapError;
   catch = methods.catch;
   repeatForever = methods.repeatForever;
+  delay = methods.delay;
 }
 
 function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
@@ -200,6 +206,10 @@ const methods = {
 
   repeatForever<A, E>(this: IO<A, E>): IO<never, E> {
     return this.andThen(() => this.repeatForever());
+  },
+
+  delay<A, E>(this: IO<A, E>, time: number, units: TimeUnits): IO<A, E> {
+    return this.andThen((a) => IO.wait(time, units).andThen(() => IO.wrap(a)));
   },
 };
 
@@ -226,13 +236,13 @@ type ExtractError<Action extends IO<unknown, unknown>> = Action extends IO<
 >
   ? E
   : never;
+type ExtractValue<Action> = Action extends IO<infer A, unknown> ? A : never;
 
+type UnionOfValues<Actions extends IOArray> = ExtractValue<Actions[number]>;
 type UnionOfErrors<Actions extends IOArray> = ExtractError<Actions[number]>;
 
-type ExtractResult<Action> = Action extends IO<infer A, unknown> ? A : never;
-
-type ResultsArray<Actions extends IOArray> = {
-  [I in keyof Actions]: ExtractResult<Actions[I]>;
+type ValuesArray<Actions extends IOArray> = {
+  [I in keyof Actions]: ExtractValue<Actions[I]>;
 };
 
 /**
@@ -242,7 +252,7 @@ type ResultsArray<Actions extends IOArray> = {
  */
 function sequence<Actions extends IOArray>(
   actions: Actions
-): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
+): IO<ValuesArray<Actions>, UnionOfErrors<Actions>> {
   return sequenceFrom(actions, 0, [] as const);
 }
 
@@ -250,11 +260,11 @@ function sequenceFrom<Actions extends IOArray>(
   actions: Actions,
   index: number,
   results: readonly unknown[]
-): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
+): IO<ValuesArray<Actions>, UnionOfErrors<Actions>> {
   // TODO find a more type-safe way to express this function.
 
   if (index >= actions.length) {
-    return IO.wrap(results as ResultsArray<Actions>);
+    return IO.wrap(results as ValuesArray<Actions>);
   } else {
     const action = actions[index] as IO<unknown, UnionOfErrors<Actions>>;
     return action.andThen((result) =>
@@ -270,7 +280,7 @@ function sequenceFrom<Actions extends IOArray>(
  */
 function parallel<Actions extends IOArray>(
   actions: Actions
-): IO<ResultsArray<Actions>, UnionOfErrors<Actions>> {
+): IO<ValuesArray<Actions>, UnionOfErrors<Actions>> {
   return IO(
     () =>
       new Promise<Array<IOResult<unknown, unknown>>>((resolve, reject) => {
@@ -320,8 +330,55 @@ function parallel<Actions extends IOArray>(
           }
         }
       }
-      return IO.wrap((succeeded as unknown) as ResultsArray<Actions>);
+      return IO.wrap((succeeded as unknown) as ValuesArray<Actions>);
     });
+}
+
+/**
+ * Creates an IO from an array of IOs, which will perform
+ * the actions concurrently, returning the earliest successful result
+ * or stopping when the first error occurs.
+ */
+function race<Actions extends IOArray>(
+  actions: Actions
+): IO<
+  UnionOfValues<Actions>,
+  | UnionOfErrors<Actions>
+  | (Actions extends { [0]: unknown } ? never : TypeError)
+> {
+  // The type signature for this function is a little scary. That is mainly to
+  // represent accurately the fact that it will never raise this TypeError if
+  // the array of actions is provably non-empty.
+  if (actions.length === 0) {
+    return IO.raise(TypeError("Cannot race an empty array of actions")) as IO<
+      never,
+      Actions extends { [0]: unknown } ? never : TypeError
+    >;
+  }
+  return IO(
+    () =>
+      new Promise<IOResult<UnionOfValues<Actions>, UnionOfErrors<Actions>>>(
+        (resolve, reject) => {
+          for (let i = 0; i < actions.length; i++) {
+            (actions[i] as IO<UnionOfValues<Actions>, UnionOfErrors<Actions>>)
+              .runSafe()
+              .then(resolve, reject);
+          }
+        }
+      )
+  )
+    .catch(
+      (unsoundlyThrownError): IO<never, never> => {
+        // The promise above never intentionally rejects, so an error
+        // here means an error was thrown outside of the IO system.
+        throw unsoundlyThrownError;
+      }
+    )
+    .andThen((safeResult) =>
+      safeResult.outcome === IOOutcome.Succeeded
+        ? IO.wrap(safeResult.value)
+        : IO.raise(safeResult.value)
+    );
 }
 
 const TIME_UNIT_FACTORS = {
@@ -337,9 +394,11 @@ const TIME_UNIT_FACTORS = {
 
 type TimeUnits = keyof typeof TIME_UNIT_FACTORS;
 
-function wait(time: number, units: TimeUnits): IO<void> {
+function wait(time: number, units: TimeUnits): IO<void, never> {
   const milliseconds = time * TIME_UNIT_FACTORS[units];
-  return IO(() => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+  return IO(
+    () => new Promise((resolve) => setTimeout(resolve, milliseconds))
+  ) as IO<void, never>;
 }
 
 IO.wrap = wrap;
@@ -348,6 +407,7 @@ IO.lift = lift;
 IO.void = IO.wrap<void>(undefined);
 IO.sequence = sequence;
 IO.parallel = parallel;
+IO.race = race;
 IO.wait = wait;
 
 export default IO;

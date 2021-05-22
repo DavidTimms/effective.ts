@@ -103,6 +103,47 @@ describe("The IO.parallel function", () => {
   });
 });
 
+describe("The IO.race function", () => {
+  it("combines an array of IOs into a single IO returning the earliest result to resolve", () =>
+    fc.assert(
+      fc.asyncProperty(
+        fc.array(fc.integer({ min: 0, max: 4 }).map((int) => int * 10)),
+        async (delays) => {
+          // IO.race does not allow empty arrays
+          fc.pre(delays.length > 0);
+
+          // An array of actions which each wait the specified delay
+          // before returning its value.
+          const actions = delays.map((delay) =>
+            IO.wrap(delay).delay(delay, "milliseconds")
+          );
+
+          const expectedWinner = Math.min(...delays);
+          const raced = IO.race([actions[0], ...actions.slice(1)]);
+          const winner = await raced.run();
+          return expect(winner).toEqual(expectedWinner);
+        }
+      )
+    ));
+
+  it("stops at the earliest error encountered", async () => {
+    const failsSlowly = IO.raise("failed slowly").delay(100, "milliseconds");
+    const succeeeds = IO.wrap("succeeeded").delay(50, "milliseconds");
+    const failsQuickly = IO.raise("failed quickly").delay(10, "milliseconds");
+    const raced = IO.race([failsSlowly, succeeeds, failsQuickly]);
+    await expect(raced.run()).rejects.toBe("failed slowly");
+  });
+
+  it("infers the union of the value and error types", async () => {
+    const raced: IO<number | boolean, string | Error> = IO.race([
+      IO.wrap(123),
+      IO.wrap(true),
+      IO.raise("bang!"),
+      IO.raise(Error()),
+    ]);
+  });
+});
+
 describe("The repeatForever method", () => {
   it("returns an IO which repeats the action infinitely", async () => {
     let performedCount = 0;
