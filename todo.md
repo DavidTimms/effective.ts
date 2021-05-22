@@ -11,7 +11,7 @@
 # Async, Concurrency & Fault Tolerance
 
 - [x] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
-- [ ] timeout method (implement in terms of `IO.race`?)
+- [x] timeout method (implement in terms of `IO.race`?)
 - [ ] retry method
 - [ ] cancellation
 - [ ] fibers
@@ -21,6 +21,12 @@
 - [x] make recursive IO stack-safe
 - [ ] optimise to avoid creation of unnecessary promises
 - [ ] write some useful benchmarks - compare async/await/throw implementation to IO
+
+# Code Organisation
+
+- [ ] work out how to split into several modules
+- [ ] replace `IOInterface` and `methods` object with abstract base class
+- [ ] Use consistent terminology throughout - e.g. IO vs action vs effect
 
 ### Ergonomics Improvements
 

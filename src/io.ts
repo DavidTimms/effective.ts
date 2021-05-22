@@ -1,3 +1,5 @@
+import { TimeoutError } from "./errors";
+
 type IO<A, E = unknown> =
   | Wrap<A, E>
   | Defer<A, E>
@@ -23,6 +25,7 @@ interface IOInterface<A, E = unknown> {
   runSafe(): Promise<IOResult<A, E>>;
   repeatForever(): IO<never, E>;
   delay(time: number, units: TimeUnits): IO<A, E>;
+  timeout(time: number, units: TimeUnits): IO<A, E | TimeoutError>;
 }
 
 class Wrap<A, E> implements IOInterface<A, E> {
@@ -45,6 +48,7 @@ class Wrap<A, E> implements IOInterface<A, E> {
   catch = methods.catch;
   repeatForever = methods.repeatForever;
   delay = methods.delay;
+  timeout = methods.timeout;
 }
 
 class Defer<A, E> implements IOInterface<A, E> {
@@ -74,6 +78,7 @@ class Defer<A, E> implements IOInterface<A, E> {
   catch = methods.catch;
   repeatForever = methods.repeatForever;
   delay = methods.delay;
+  timeout = methods.timeout;
 }
 
 class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
@@ -123,6 +128,7 @@ class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
   catch = methods.catch;
   repeatForever = methods.repeatForever;
   delay = methods.delay;
+  timeout = methods.timeout;
 }
 
 class Raise<A, E> implements IOInterface<A, E> {
@@ -145,6 +151,7 @@ class Raise<A, E> implements IOInterface<A, E> {
   catch = methods.catch;
   repeatForever = methods.repeatForever;
   delay = methods.delay;
+  timeout = methods.timeout;
 }
 
 class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
@@ -182,6 +189,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
   catch = methods.catch;
   repeatForever = methods.repeatForever;
   delay = methods.delay;
+  timeout = methods.timeout;
 }
 
 function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
@@ -209,7 +217,18 @@ const methods = {
   },
 
   delay<A, E>(this: IO<A, E>, time: number, units: TimeUnits): IO<A, E> {
-    return this.andThen((a) => IO.wait(time, units).andThen(() => IO.wrap(a)));
+    return IO.wait(time, units).andThen(() => this);
+  },
+
+  timeout<A, E>(
+    this: IO<A, E>,
+    time: number,
+    units: TimeUnits
+  ): IO<A, E | TimeoutError> {
+    return IO.race([
+      this,
+      IO.wait(time, units).andThen(() => IO.raise(new TimeoutError())),
+    ]);
   },
 };
 

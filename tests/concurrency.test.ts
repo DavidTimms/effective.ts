@@ -131,7 +131,7 @@ describe("The IO.race function", () => {
     const succeeeds = IO.wrap("succeeeded").delay(50, "milliseconds");
     const failsQuickly = IO.raise("failed quickly").delay(10, "milliseconds");
     const raced = IO.race([failsSlowly, succeeeds, failsQuickly]);
-    await expect(raced.run()).rejects.toBe("failed slowly");
+    await expect(raced.run()).rejects.toBe("failed quickly");
   });
 
   it("infers the union of the value and error types", async () => {
