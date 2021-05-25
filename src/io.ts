@@ -7,12 +7,12 @@ type IO<A, E = unknown> =
   | Raise<A, E>
   | Catch<A, E, any, any, any>;
 
-enum IOOutcome {
+export enum IOOutcome {
   Succeeded,
   Raised,
 }
 
-type IOResult<A, E> =
+export type IOResult<A, E> =
   | { outcome: IOOutcome.Succeeded; value: A }
   | { outcome: IOOutcome.Raised; value: E };
 
@@ -134,6 +134,8 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
       const result = await parent.runSafe();
       if (result.outcome === IOOutcome.Succeeded) {
         io = next(result.value);
+      } else {
+        return result;
       }
     }
     return io.runSafe();
