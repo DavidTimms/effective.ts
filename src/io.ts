@@ -16,20 +16,58 @@ type IOResult<A, E> =
   | { outcome: IOOutcome.Succeeded; value: A }
   | { outcome: IOOutcome.Raised; value: E };
 
-interface IOInterface<A, E = unknown> {
-  map<B>(mapping: (a: A) => B): IO<B, E>;
-  andThen<B, E2>(next: (a: A) => IO<B, E2>): IO<B, E | E2>;
-  mapError<E2>(mapping: (e: E) => E2): IO<A, E2>;
-  catch<B, E2>(catcher: (e: E) => IO<B, E2>): IO<A | B, E2>;
-  run(): Promise<A>;
-  runSafe(): Promise<IOResult<A, E>>;
-  repeatForever(): IO<never, E>;
-  delay(time: number, units: TimeUnits): IO<A, E>;
-  timeout(time: number, units: TimeUnits): IO<A, E | TimeoutError>;
+abstract class IOBase<A, E = unknown> {
+  abstract runSafe(): Promise<IOResult<A, E>>;
+
+  async run(): Promise<A> {
+    const result = await this.runSafe();
+    if (result.outcome === IOOutcome.Succeeded) {
+      return result.value;
+    } else {
+      throw result.value;
+    }
+  }
+
+  andThen<B, E2>(this: IO<A, E>, next: (a: A) => IO<B, E2>): IO<B, E | E2> {
+    return new AndThen<B, E | E2, A, E>(this, next);
+  }
+
+  map<B>(this: IO<A, E>, mapping: (a: A) => B): IO<B, E> {
+    return this.andThen((a) => IO.wrap(mapping(a)));
+  }
+
+  catch<B, E2>(this: IO<A, E>, catcher: (e: E) => IO<B, E2>): IO<A | B, E2> {
+    return new Catch(this, catcher);
+  }
+
+  mapError<E2>(this: IO<A, E>, mapping: (e: E) => E2): IO<A, E2> {
+    return this.catch((e) => IO.raise(mapping(e)));
+  }
+
+  repeatForever(this: IO<A, E>): IO<never, E> {
+    return this.andThen(() => this.repeatForever());
+  }
+
+  delay(this: IO<A, E>, time: number, units: TimeUnits): IO<A, E> {
+    return IO.wait(time, units).andThen(() => this);
+  }
+
+  timeout(
+    this: IO<A, E>,
+    time: number,
+    units: TimeUnits
+  ): IO<A, E | TimeoutError> {
+    return IO.race([
+      this,
+      IO.wait(time, units).andThen(() => IO.raise(new TimeoutError())),
+    ]);
+  }
 }
 
-class Wrap<A, E> implements IOInterface<A, E> {
-  constructor(private readonly value: A) {}
+class Wrap<A, E> extends IOBase<A, E> {
+  constructor(private readonly value: A) {
+    super();
+  }
 
   async run(): Promise<A> {
     return this.value;
@@ -38,21 +76,12 @@ class Wrap<A, E> implements IOInterface<A, E> {
   async runSafe(): Promise<IOResult<A, E>> {
     return { outcome: IOOutcome.Succeeded, value: this.value };
   }
-
-  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
-    return new AndThen<B, E | E2, A, E>(this, next);
-  }
-
-  map = methods.map;
-  mapError = methods.mapError;
-  catch = methods.catch;
-  repeatForever = methods.repeatForever;
-  delay = methods.delay;
-  timeout = methods.timeout;
 }
 
-class Defer<A, E> implements IOInterface<A, E> {
-  constructor(private readonly effect: () => Promise<A> | A) {}
+class Defer<A, E> extends IOBase<A, E> {
+  constructor(private readonly effect: () => Promise<A> | A) {
+    super();
+  }
 
   async run(): Promise<A> {
     const effect = this.effect;
@@ -68,24 +97,15 @@ class Defer<A, E> implements IOInterface<A, E> {
       return { outcome: IOOutcome.Raised, value: e as E };
     }
   }
-
-  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
-    return new AndThen<B, E | E2, A, E>(this, next);
-  }
-
-  map = methods.map;
-  mapError = methods.mapError;
-  catch = methods.catch;
-  repeatForever = methods.repeatForever;
-  delay = methods.delay;
-  timeout = methods.timeout;
 }
 
-class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
+class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
   constructor(
     readonly parent: IO<ParentA, ParentE>,
     readonly next: (parentA: ParentA) => IO<A, E>
-  ) {}
+  ) {
+    super();
+  }
 
   async run(): Promise<A> {
     // TODO attempt to find a way to implement this function
@@ -118,21 +138,12 @@ class AndThen<A, E, ParentA, ParentE extends E> implements IOInterface<A, E> {
     }
     return io.runSafe();
   }
-
-  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
-    return new AndThen<B, E | E2, A, E>(this, next);
-  }
-
-  map = methods.map;
-  mapError = methods.mapError;
-  catch = methods.catch;
-  repeatForever = methods.repeatForever;
-  delay = methods.delay;
-  timeout = methods.timeout;
 }
 
-class Raise<A, E> implements IOInterface<A, E> {
-  constructor(private readonly error: E) {}
+class Raise<A, E> extends IOBase<A, E> {
+  constructor(private readonly error: E) {
+    super();
+  }
 
   async run(): Promise<never> {
     throw this.error;
@@ -141,33 +152,17 @@ class Raise<A, E> implements IOInterface<A, E> {
   async runSafe(): Promise<IOResult<A, E>> {
     return { outcome: IOOutcome.Raised, value: this.error };
   }
-
-  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
-    return (this as unknown) as IO<B, E>;
-  }
-
-  map = methods.map;
-  mapError = methods.mapError;
-  catch = methods.catch;
-  repeatForever = methods.repeatForever;
-  delay = methods.delay;
-  timeout = methods.timeout;
 }
 
-class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
-  implements IOInterface<A, E> {
+class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
+  A,
+  E
+> {
   constructor(
     readonly parent: IO<ParentA, ParentE>,
     private readonly catcher: (parentE: ParentE) => IO<CaughtA, E>
-  ) {}
-
-  async run(): Promise<A> {
-    const result = await this.runSafe();
-    if (result.outcome === IOOutcome.Succeeded) {
-      return result.value;
-    } else {
-      throw result.value;
-    }
+  ) {
+    super();
   }
 
   async runSafe(): Promise<IOResult<A, E>> {
@@ -179,58 +174,11 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE>
       return catcher(parentResult.value).runSafe();
     }
   }
-
-  andThen<B, E2 = never>(next: (a: A) => IO<B, E2>): IO<B, E | E2> {
-    return new AndThen<B, E | E2, A, E>(this, next);
-  }
-
-  map = methods.map;
-  mapError = methods.mapError;
-  catch = methods.catch;
-  repeatForever = methods.repeatForever;
-  delay = methods.delay;
-  timeout = methods.timeout;
 }
 
 function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(effect);
 }
-
-const methods = {
-  map<A, B, E>(this: IO<A, E>, mapping: (a: A) => B): IO<B, E> {
-    return this.andThen((a) => IO.wrap(mapping(a)));
-  },
-
-  mapError<A, E, E2>(this: IO<A, E>, mapping: (e: E) => E2): IO<A, E2> {
-    return this.catch((e) => IO.raise(mapping(e)));
-  },
-
-  catch<ParentA, ParentE, CaughtA, CaughtE>(
-    this: IO<ParentA, ParentE>,
-    catcher: (e: ParentE) => IO<CaughtA, CaughtE>
-  ): IO<ParentA | CaughtA, CaughtE> {
-    return new Catch(this, catcher);
-  },
-
-  repeatForever<A, E>(this: IO<A, E>): IO<never, E> {
-    return this.andThen(() => this.repeatForever());
-  },
-
-  delay<A, E>(this: IO<A, E>, time: number, units: TimeUnits): IO<A, E> {
-    return IO.wait(time, units).andThen(() => this);
-  },
-
-  timeout<A, E>(
-    this: IO<A, E>,
-    time: number,
-    units: TimeUnits
-  ): IO<A, E | TimeoutError> {
-    return IO.race([
-      this,
-      IO.wait(time, units).andThen(() => IO.raise(new TimeoutError())),
-    ]);
-  },
-};
 
 function wrap<A>(value: A): IO<A, never> {
   return new Wrap(value);

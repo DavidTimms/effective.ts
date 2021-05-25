@@ -172,7 +172,7 @@ describe("The catch method", () => {
         .andThen(() => {
           throw error;
         })
-        .catch((e) => e);
+        .catch((e) => IO.wrap(e));
 
       return expect(io.run()).rejects.toBe(error);
     }

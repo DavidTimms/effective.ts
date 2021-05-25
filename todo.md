@@ -25,7 +25,7 @@
 # Code Organisation
 
 - [ ] work out how to split into several modules
-- [ ] replace `IOInterface` and `methods` object with abstract base class
+- [x] replace `IOInterface` and `methods` object with abstract base class
 - [ ] Use consistent terminology throughout - e.g. IO vs action vs effect
 
 ### Ergonomics Improvements
