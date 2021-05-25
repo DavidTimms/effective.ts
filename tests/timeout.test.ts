@@ -7,8 +7,8 @@ describe("The timeout method", () => {
     fc.assert(
       fc.asyncProperty(
         io,
-        fc.integer({ min: 0, max: 40 }),
-        fc.integer({ min: 0, max: 40 }),
+        fc.integer({ min: 0, max: 8 }).map((x) => x * 5),
+        fc.integer({ min: 0, max: 8 }).map((x) => x * 5),
         async (io, msToComplete, msToTimeout) => {
           fc.pre(msToComplete > msToTimeout);
           await expect(
@@ -25,8 +25,8 @@ describe("The timeout method", () => {
     fc.assert(
       fc.asyncProperty(
         io,
-        fc.integer({ min: 0, max: 40 }),
-        fc.integer({ min: 0, max: 40 }),
+        fc.integer({ min: 0, max: 8 }).map((x) => x * 5),
+        fc.integer({ min: 0, max: 8 }).map((x) => x * 5),
         async (io, msToComplete, msToTimeout) => {
           fc.pre(msToComplete <= msToTimeout);
           expect(
