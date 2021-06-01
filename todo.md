@@ -3,8 +3,8 @@
 - [x] add tests (property-based tests for monad laws?)
 - [x] change then method to flatMap
 - [x] support async
-- [X] catch method
-- [X] correct type restrictions on errors
+- [x] catch method
+- [x] correct type restrictions on errors
 - [x] sequence and parallel functions
 - [x] race function
 
@@ -31,10 +31,10 @@
 ### Ergonomics Improvements
 
 - [x] lift function to return IO
-- [X] map method
-- [X] mapError method
+- [x] map method
+- [x] mapError method
 - [ ] forEach method (and parallel equivalent)
-- [ ] `.as` method
+- [x] `.as` method
 - [x] repeatForever method
 - [ ] some more helper methods for composing independent IOs and returning the first or second value
 - [ ] overload `andThen` to take an `IO` instead of a `() => IO`

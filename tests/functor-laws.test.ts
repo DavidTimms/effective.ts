@@ -1,4 +1,4 @@
-import fc, { Arbitrary } from "fast-check";
+import fc from "fast-check";
 import * as arbitraries from "./arbitraries";
 
 describe("The IO type is a valid functor (in two different ways!)", () => {

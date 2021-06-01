@@ -44,6 +44,11 @@ abstract class IOBase<A, E = unknown> {
     return this.catch((e) => IO.raise(mapping(e)));
   }
 
+  as<B>(this: IO<A, E>, value: B): IO<B, E> {
+    const wrappedValue = IO.wrap(value);
+    return this.andThen(() => wrappedValue);
+  }
+
   repeatForever(this: IO<A, E>): IO<never, E> {
     return this.andThen(() => this.repeatForever());
   }
