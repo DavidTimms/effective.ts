@@ -11,9 +11,17 @@
   "description": "An idiomatic IO monad for TypeScript",
   "version": "0.0.1",
   "main": "dist/io.js",
+  "types": "dist/io.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
+    "build": "tsc",
     "test": "jest --forceExit",
-    "lint": "prettier --check '**.ts'"
+    "lint": "prettier --check '**.ts'",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -28,6 +36,7 @@
   ],
   "author": "David Timms",
   "license": "UNLICENSED",
+  "sideEffects": false,
   "bugs": {
     "url": "https://github.com/DavidTimms/effective/issues"
   },
