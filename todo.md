@@ -12,7 +12,9 @@
 
 - [x] wait function e.g. `.andThen(IO.wait(5, "seconds"))`
 - [x] timeout method (implement in terms of `IO.race`?)
-- [ ] retry method
+- [x] retry method
+- [ ] exponential backoff for retry
+- [ ] filter for retry
 - [ ] cancellation
 - [ ] fibers
 

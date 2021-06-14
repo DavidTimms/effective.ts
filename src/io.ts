@@ -67,6 +67,17 @@ abstract class IOBase<A, E = unknown> {
       IO.wait(time, units).andThen(() => IO.raise(new TimeoutError())),
     ]);
   }
+
+  /**
+   * Re-run the IO if it raises an error, up to the given number of times.
+   **/
+  retry(this: IO<A, E>, retryCount: number): IO<A, E> {
+    if (retryCount < 1) {
+      return this;
+    } else {
+      return this.catch(() => this.retry(retryCount - 1));
+    }
+  }
 }
 
 class Wrap<A, E> extends IOBase<A, E> {
