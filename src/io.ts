@@ -16,6 +16,10 @@ export type IOResult<A, E> =
   | { outcome: IOOutcome.Succeeded; value: A }
   | { outcome: IOOutcome.Raised; value: E };
 
+export type RetryOptions<E = unknown> = {
+  count: number;
+};
+
 abstract class IOBase<A, E = unknown> {
   abstract runSafe(): Promise<IOResult<A, E>>;
 
@@ -71,11 +75,18 @@ abstract class IOBase<A, E = unknown> {
   /**
    * Re-run the IO if it raises an error, up to the given number of times.
    **/
-  retry(this: IO<A, E>, retryCount: number): IO<A, E> {
-    if (retryCount < 1) {
+  retry(this: IO<A, E>, countOrOptions: number | RetryOptions<E>): IO<A, E> {
+    const options =
+      typeof countOrOptions === "number"
+        ? { count: countOrOptions }
+        : countOrOptions;
+
+    if (options.count < 1) {
       return this;
     } else {
-      return this.catch(() => this.retry(retryCount - 1));
+      return this.catch(() =>
+        this.retry({ ...options, count: options.count - 1 })
+      );
     }
   }
 }

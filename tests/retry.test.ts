@@ -17,7 +17,7 @@ describe("The retry method", () => {
     ));
   it("performs the effect N + 1 times if it continues to fail", () =>
     fc.assert(
-      fc.asyncProperty(fc.integer({ min: 3, max: 10 }), async (retryCount) => {
+      fc.asyncProperty(fc.integer({ min: 0, max: 10 }), async (retryCount) => {
         let attempts = 0;
         const io = IO(() => (attempts = attempts + 1))
           .andThen(() => IO.raise("Always fails"))
@@ -26,5 +26,27 @@ describe("The retry method", () => {
         await expect(io.run()).rejects.toBe("Always fails");
         expect(attempts).toBe(retryCount + 1);
       })
+    ));
+  it("succeeds if the IO succeeds before the retries are exhausted", () =>
+    fc.assert(
+      fc.asyncProperty(
+        fc.integer({ min: 0, max: 10 }),
+        fc.integer({ min: 0, max: 10 }),
+        async (retryCount, attemptsBeforeSuccess) => {
+          fc.pre(retryCount >= attemptsBeforeSuccess);
+
+          let attempts = 0;
+
+          const io = IO(() => (attempts = attempts + 1))
+            .andThen((attempts) =>
+              attempts > attemptsBeforeSuccess
+                ? IO.wrap("success")
+                : IO.raise("fail")
+            )
+            .retry({ count: retryCount });
+
+          await expect(io.run()).resolves.toBe("success");
+        }
+      )
     ));
 });
