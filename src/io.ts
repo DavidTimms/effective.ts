@@ -27,11 +27,13 @@ export type RetryOptions<E = unknown> = {
    * raised error should be retried.
    **/
   filter?: (error: E) => boolean;
+  delay?: Duration;
 };
 
 export const RetryOptions = {
   defaults: {
     filter: () => true,
+    delay: [0, "milliseconds"],
   },
 } as const;
 
@@ -73,7 +75,11 @@ abstract class IOBase<A, E = unknown> {
   }
 
   delay(this: IO<A, E>, time: number, units: TimeUnits): IO<A, E> {
-    return IO.wait(time, units).andThen(() => this);
+    if (time > 0) {
+      return IO.wait(time, units).andThen(() => this);
+    } else {
+      return this;
+    }
   }
 
   timeout(
@@ -100,13 +106,17 @@ abstract class IOBase<A, E = unknown> {
 
     if (options.count < 1) {
       return this;
-    } else {
-      return this.catch((error) =>
-        options.filter(error)
-          ? this.retry({ ...options, count: options.count - 1 })
-          : IO.raise(error)
-      );
     }
+
+    // TODO stop delay from increasing on every retry
+    return this.catch((error) =>
+      options.filter(error)
+        ? this.delay(...options.delay).retry({
+            ...options,
+            count: options.count - 1,
+          })
+        : IO.raise(error)
+    );
   }
 }
 
@@ -408,6 +418,7 @@ const TIME_UNIT_FACTORS = {
 };
 
 type TimeUnits = keyof typeof TIME_UNIT_FACTORS;
+type Duration = readonly [number, TimeUnits];
 
 function wait(time: number, units: TimeUnits): IO<void, never> {
   const milliseconds = time * TIME_UNIT_FACTORS[units];
