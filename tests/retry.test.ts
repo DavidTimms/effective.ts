@@ -49,4 +49,26 @@ describe("The retry method", () => {
         }
       )
     ));
+
+  it("will retry if the error value passes the filter", async () => {
+    let attempts = 0;
+    const io = IO(() => (attempts = attempts + 1))
+      .andThen(() => IO.raise("some error"))
+      .retry({ count: 1, filter: (e) => e === "some error" });
+
+    await io.runSafe();
+
+    expect(attempts).toBe(2);
+  });
+
+  it("will not retry if the error value does not pass the filter", async () => {
+    let attempts = 0;
+    const io = IO(() => (attempts = attempts + 1))
+      .andThen(() => IO.raise("some other error"))
+      .retry({ count: 1, filter: (e) => e === "some error" });
+
+    await io.runSafe();
+
+    expect(attempts).toBe(1);
+  });
 });

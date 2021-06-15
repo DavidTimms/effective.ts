@@ -1,5 +1,7 @@
 import { TimeoutError } from "./errors";
 
+export { TimeoutError };
+
 type IO<A, E = unknown> =
   | Wrap<A, E>
   | Defer<A, E>
@@ -17,8 +19,21 @@ export type IOResult<A, E> =
   | { outcome: IOOutcome.Raised; value: E };
 
 export type RetryOptions<E = unknown> = {
+  /** The number of times to retry. */
   count: number;
+
+  /**
+   * A predicate which will be called to decide whether a
+   * raised error should be retried.
+   **/
+  filter?: (error: E) => boolean;
 };
+
+export const RetryOptions = {
+  defaults: {
+    filter: () => true,
+  },
+} as const;
 
 abstract class IOBase<A, E = unknown> {
   abstract runSafe(): Promise<IOResult<A, E>>;
@@ -75,17 +90,21 @@ abstract class IOBase<A, E = unknown> {
   /**
    * Re-run the IO if it raises an error, up to the given number of times.
    **/
+  retry(this: IO<A, E>, retryCount: number): IO<A, E>;
+  retry(this: IO<A, E>, options: RetryOptions<E>): IO<A, E>;
   retry(this: IO<A, E>, countOrOptions: number | RetryOptions<E>): IO<A, E> {
-    const options =
+    const options: Required<RetryOptions<E>> =
       typeof countOrOptions === "number"
-        ? { count: countOrOptions }
-        : countOrOptions;
+        ? { count: countOrOptions, ...RetryOptions.defaults }
+        : { ...RetryOptions.defaults, ...countOrOptions };
 
     if (options.count < 1) {
       return this;
     } else {
-      return this.catch(() =>
-        this.retry({ ...options, count: options.count - 1 })
+      return this.catch((error) =>
+        options.filter(error)
+          ? this.retry({ ...options, count: options.count - 1 })
+          : IO.raise(error)
       );
     }
   }
