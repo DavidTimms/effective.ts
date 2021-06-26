@@ -104,19 +104,19 @@ abstract class IOBase<A, E = unknown> {
         ? { count: countOrOptions, ...RetryOptions.defaults }
         : { ...RetryOptions.defaults, ...countOrOptions };
 
-    if (options.count < 1) {
-      return this;
-    }
+    const nextAttempt = (remaining: number): IO<A, E> => {
+      if (remaining < 1) {
+        return this;
+      } else {
+        return this.catch((error) =>
+          options.filter(error)
+            ? nextAttempt(remaining - 1).delay(...options.delay)
+            : IO.raise(error)
+        );
+      }
+    };
 
-    // TODO stop delay from increasing on every retry
-    return this.catch((error) =>
-      options.filter(error)
-        ? this.delay(...options.delay).retry({
-            ...options,
-            count: options.count - 1,
-          })
-        : IO.raise(error)
-    );
+    return nextAttempt(options.count);
   }
 }
 
@@ -423,7 +423,7 @@ type Duration = readonly [number, TimeUnits];
 function wait(time: number, units: TimeUnits): IO<void, never> {
   const milliseconds = time * TIME_UNIT_FACTORS[units];
   return IO(
-    () => new Promise((resolve) => setTimeout(resolve, milliseconds))
+    () => new Promise((resolve) => IO._setTimeout(resolve, milliseconds))
   ) as IO<void, never>;
 }
 
@@ -435,5 +435,10 @@ IO.sequence = sequence;
 IO.parallel = parallel;
 IO.race = race;
 IO.wait = wait;
+
+// This alias for setTimeout is used instead of calling the
+// global directly, so it can be replaced with intercepting
+// implementations in tests.
+IO._setTimeout = setTimeout;
 
 export default IO;

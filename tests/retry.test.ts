@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import IO from "../src/io";
 import { io } from "./arbitraries";
+import { runSafeWithTimeoutTrace } from "./utils";
 
 describe("The retry method", () => {
   it("does not affect the returned result for a deterministic IO", () =>
@@ -70,5 +71,17 @@ describe("The retry method", () => {
     await io.runSafe();
 
     expect(attempts).toBe(1);
+  });
+
+  it("waits for the specified delay between attempts", async () => {
+    const io = IO.raise("an error").retry({ count: 3, delay: [2, "seconds"] });
+
+    const [result, timeoutTrace] = await runSafeWithTimeoutTrace(io);
+
+    expect(timeoutTrace).toHaveLength(3);
+    const waitTwoSeconds = ["setTimeout", 2000, expect.anything()];
+    expect(timeoutTrace[0]).toEqual(waitTwoSeconds);
+    expect(timeoutTrace[1]).toEqual(waitTwoSeconds);
+    expect(timeoutTrace[2]).toEqual(waitTwoSeconds);
   });
 });
