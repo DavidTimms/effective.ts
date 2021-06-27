@@ -77,6 +77,10 @@ abstract class IOBase<A, E = unknown> {
     return this.catch((e) => IO.raise(mapping(e)));
   }
 
+  through<B, E2>(this: IO<A, E>, next: (a: A) => IO<B, E2>): IO<A, E | E2> {
+    return this.andThen((a) => next(a).as(a));
+  }
+
   as<B>(this: IO<A, E>, value: B): IO<B, E> {
     const wrappedValue = IO.wrap(value);
     return this.andThen(() => wrappedValue);
