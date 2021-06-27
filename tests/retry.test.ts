@@ -74,14 +74,27 @@ describe("The retry method", () => {
   });
 
   it("waits for the specified delay between attempts", async () => {
-    const io = IO.raise("an error").retry({ count: 3, delay: [2, "seconds"] });
+    const io = IO.raise("an error").retry({ count: 2, delay: [2, "seconds"] });
+
+    const [result, timeoutTrace] = await runSafeWithTimeoutTrace(io);
+
+    expect(timeoutTrace).toHaveLength(2);
+    expect(timeoutTrace[0]).toEqual(["setTimeout", 2000, expect.anything()]);
+    expect(timeoutTrace[1]).toEqual(["setTimeout", 2000, expect.anything()]);
+  });
+
+  it("multiplies the delay by the backoff factor after each retry", async () => {
+    const io = IO.raise("an error").retry({
+      count: 3,
+      delay: [500, "milliseconds"],
+      backoff: 3,
+    });
 
     const [result, timeoutTrace] = await runSafeWithTimeoutTrace(io);
 
     expect(timeoutTrace).toHaveLength(3);
-    const waitTwoSeconds = ["setTimeout", 2000, expect.anything()];
-    expect(timeoutTrace[0]).toEqual(waitTwoSeconds);
-    expect(timeoutTrace[1]).toEqual(waitTwoSeconds);
-    expect(timeoutTrace[2]).toEqual(waitTwoSeconds);
+    expect(timeoutTrace[0]).toEqual(["setTimeout", 500, expect.anything()]);
+    expect(timeoutTrace[1]).toEqual(["setTimeout", 1500, expect.anything()]);
+    expect(timeoutTrace[2]).toEqual(["setTimeout", 4500, expect.anything()]);
   });
 });

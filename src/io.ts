@@ -27,15 +27,27 @@ export type RetryOptions<E = unknown> = {
    * raised error should be retried.
    **/
   filter?: (error: E) => boolean;
+
+  /**
+   * The time to wait after each failed attempt before retrying.
+   */
   delay?: Duration;
+
+  /**
+   * The factor to multiply the delay by after each failed attempt.
+   */
+  backoff?: number;
 };
 
-export const RetryOptions = {
+export const RetryOptions: {
+  defaults: Omit<Required<RetryOptions>, "count">;
+} = {
   defaults: {
     filter: () => true,
     delay: [0, "milliseconds"],
+    backoff: 1,
   },
-} as const;
+};
 
 abstract class IOBase<A, E = unknown> {
   abstract runSafe(): Promise<IOResult<A, E>>;
@@ -104,19 +116,23 @@ abstract class IOBase<A, E = unknown> {
         ? { count: countOrOptions, ...RetryOptions.defaults }
         : { ...RetryOptions.defaults, ...countOrOptions };
 
-    const nextAttempt = (remaining: number): IO<A, E> => {
-      if (remaining < 1) {
+    const nextAttempt = (attemptNumber: number): IO<A, E> => {
+      if (attemptNumber >= options.count) {
         return this;
       } else {
-        return this.catch((error) =>
-          options.filter(error)
-            ? nextAttempt(remaining - 1).delay(...options.delay)
-            : IO.raise(error)
-        );
+        return this.catch((error) => {
+          // Calculate the delay before the next attempt using exponential backoff.
+          const [initialDelayMs, delayUnits] = options.delay;
+          const nextDelayMs = initialDelayMs * options.backoff ** attemptNumber;
+
+          return options.filter(error)
+            ? nextAttempt(attemptNumber + 1).delay(nextDelayMs, delayUnits)
+            : IO.raise(error);
+        });
       }
     };
 
-    return nextAttempt(options.count);
+    return nextAttempt(0);
   }
 }
 
