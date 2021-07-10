@@ -1,0 +1,3030 @@
+{
+	"id": 0,
+	"name": "effective",
+	"kind": 0,
+	"kindString": "Project",
+	"flags": {},
+	"originalName": "",
+	"children": [
+		{
+			"id": 150,
+			"name": "default",
+			"kind": 16777216,
+			"kindString": "Reference",
+			"flags": {},
+			"target": 1
+		},
+		{
+			"id": 7,
+			"name": "IO",
+			"kind": 2,
+			"kindString": "Namespace",
+			"flags": {},
+			"children": [
+				{
+					"id": 53,
+					"name": "_setTimeout",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "query",
+						"queryType": {
+							"type": "reference",
+							"name": "setTimeout"
+						}
+					}
+				},
+				{
+					"id": 18,
+					"name": "lift",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 19,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 20,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"typeParameter": [
+										{
+											"id": 21,
+											"name": "Args",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {},
+											"type": {
+												"type": "array",
+												"elementType": {
+													"type": "intrinsic",
+													"name": "unknown"
+												}
+											}
+										},
+										{
+											"id": 22,
+											"name": "Return",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {}
+										}
+									],
+									"parameters": [
+										{
+											"id": 23,
+											"name": "func",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reflection",
+												"declaration": {
+													"id": 24,
+													"name": "__type",
+													"kind": 65536,
+													"kindString": "Type literal",
+													"flags": {},
+													"sources": [
+														{
+															"fileName": "src/io.ts",
+															"line": 271,
+															"character": 7
+														}
+													],
+													"signatures": [
+														{
+															"id": 25,
+															"name": "__type",
+															"kind": 4096,
+															"kindString": "Call signature",
+															"flags": {},
+															"parameters": [
+																{
+																	"id": 26,
+																	"name": "args",
+																	"kind": 32768,
+																	"kindString": "Parameter",
+																	"flags": {
+																		"isRest": true
+																	},
+																	"type": {
+																		"type": "reference",
+																		"name": "Args"
+																	}
+																}
+															],
+															"type": {
+																"type": "union",
+																"types": [
+																	{
+																		"type": "reference",
+																		"typeArguments": [
+																			{
+																				"type": "reference",
+																				"name": "Return"
+																			}
+																		],
+																		"name": "Promise"
+																	},
+																	{
+																		"type": "reference",
+																		"name": "Return"
+																	}
+																]
+															}
+														}
+													]
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 27,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"sources": [
+												{
+													"fileName": "src/io.ts",
+													"line": 272,
+													"character": 2
+												}
+											],
+											"signatures": [
+												{
+													"id": 28,
+													"name": "__type",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 29,
+															"name": "args",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {
+																"isRest": true
+															},
+															"type": {
+																"type": "reference",
+																"name": "Args"
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "reference",
+																"name": "Return"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											]
+										}
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 36,
+					"name": "parallel",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 37,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 38,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Creates an IO from an array of IOs, which will perform\nthe actions concurrently, returning an array of the results,\nor stopping when the first error occurs."
+									},
+									"typeParameter": [
+										{
+											"id": 39,
+											"name": "Actions",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {},
+											"type": {
+												"type": "typeOperator",
+												"operator": "readonly",
+												"target": {
+													"type": "array",
+													"elementType": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "intrinsic",
+																"name": "unknown"
+															},
+															{
+																"type": "intrinsic",
+																"name": "unknown"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 40,
+											"name": "actions",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "Actions"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 1,
+										"typeArguments": [
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"name": "Actions"
+													}
+												],
+												"name": "ValuesArray"
+											},
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"name": "Actions"
+													}
+												],
+												"name": "UnionOfErrors"
+											}
+										],
+										"name": "IO"
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 41,
+					"name": "race",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 42,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 43,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Creates an IO from an array of IOs, which will perform\nthe actions concurrently, returning the earliest successful result\nor stopping when the first error occurs."
+									},
+									"typeParameter": [
+										{
+											"id": 44,
+											"name": "Actions",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {},
+											"type": {
+												"type": "typeOperator",
+												"operator": "readonly",
+												"target": {
+													"type": "array",
+													"elementType": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "intrinsic",
+																"name": "unknown"
+															},
+															{
+																"type": "intrinsic",
+																"name": "unknown"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 45,
+											"name": "actions",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "Actions"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 1,
+										"typeArguments": [
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"name": "Actions"
+													}
+												],
+												"name": "UnionOfValues"
+											},
+											{
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"typeArguments": [
+															{
+																"type": "reference",
+																"name": "Actions"
+															}
+														],
+														"name": "UnionOfErrors"
+													},
+													{
+														"type": "conditional",
+														"checkType": {
+															"type": "reference",
+															"name": "Actions"
+														},
+														"extendsType": {
+															"type": "reflection",
+															"declaration": {
+																"id": 46,
+																"name": "__type",
+																"kind": 65536,
+																"kindString": "Type literal",
+																"flags": {},
+																"children": [
+																	{
+																		"id": 47,
+																		"name": "0",
+																		"kind": 1024,
+																		"kindString": "Property",
+																		"flags": {},
+																		"sources": [
+																			{
+																				"fileName": "src/io.ts",
+																				"line": 392,
+																				"character": 26
+																			}
+																		],
+																		"type": {
+																			"type": "intrinsic",
+																			"name": "unknown"
+																		}
+																	}
+																],
+																"groups": [
+																	{
+																		"title": "Properties",
+																		"kind": 1024,
+																		"children": [
+																			47
+																		]
+																	}
+																],
+																"sources": [
+																	{
+																		"fileName": "src/io.ts",
+																		"line": 392,
+																		"character": 20
+																	}
+																]
+															}
+														},
+														"trueType": {
+															"type": "intrinsic",
+															"name": "never"
+														},
+														"falseType": {
+															"type": "reference",
+															"name": "TypeError"
+														}
+													}
+												]
+											}
+										],
+										"name": "IO"
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 13,
+					"name": "raise",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 14,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 15,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"typeParameter": [
+										{
+											"id": 16,
+											"name": "E",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {}
+										}
+									],
+									"parameters": [
+										{
+											"id": 17,
+											"name": "error",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "E"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 1,
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "never"
+											},
+											{
+												"type": "reference",
+												"name": "E"
+											}
+										],
+										"name": "IO"
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 31,
+					"name": "sequence",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 32,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 33,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Creates an IO from an array of IOs, which will perform\nthe actions sequentially, returning an array of the results,\nor stopping on the first error encountered."
+									},
+									"typeParameter": [
+										{
+											"id": 34,
+											"name": "Actions",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {},
+											"type": {
+												"type": "typeOperator",
+												"operator": "readonly",
+												"target": {
+													"type": "array",
+													"elementType": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "intrinsic",
+																"name": "unknown"
+															},
+															{
+																"type": "intrinsic",
+																"name": "unknown"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											}
+										}
+									],
+									"parameters": [
+										{
+											"id": 35,
+											"name": "actions",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "Actions"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 1,
+										"typeArguments": [
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"name": "Actions"
+													}
+												],
+												"name": "ValuesArray"
+											},
+											{
+												"type": "reference",
+												"typeArguments": [
+													{
+														"type": "reference",
+														"name": "Actions"
+													}
+												],
+												"name": "UnionOfErrors"
+											}
+										],
+										"name": "IO"
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 30,
+					"name": "void",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reference",
+						"id": 1,
+						"typeArguments": [
+							{
+								"type": "intrinsic",
+								"name": "void"
+							},
+							{
+								"type": "intrinsic",
+								"name": "never"
+							}
+						],
+						"name": "IO"
+					}
+				},
+				{
+					"id": 48,
+					"name": "wait",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 49,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 50,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"parameters": [
+										{
+											"id": 51,
+											"name": "time",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "intrinsic",
+												"name": "number"
+											}
+										},
+										{
+											"id": 52,
+											"name": "units",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "TimeUnits"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 1,
+										"typeArguments": [
+											{
+												"type": "intrinsic",
+												"name": "void"
+											},
+											{
+												"type": "intrinsic",
+												"name": "never"
+											}
+										],
+										"name": "IO"
+									}
+								}
+							]
+						}
+					}
+				},
+				{
+					"id": 8,
+					"name": "wrap",
+					"kind": 32,
+					"kindString": "Variable",
+					"flags": {},
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 9,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 10,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"typeParameter": [
+										{
+											"id": 11,
+											"name": "A",
+											"kind": 131072,
+											"kindString": "Type parameter",
+											"flags": {}
+										}
+									],
+									"parameters": [
+										{
+											"id": 12,
+											"name": "value",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "A"
+											}
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 1,
+										"typeArguments": [
+											{
+												"type": "reference",
+												"name": "A"
+											},
+											{
+												"type": "intrinsic",
+												"name": "never"
+											}
+										],
+										"name": "IO"
+									}
+								}
+							]
+						}
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Variables",
+					"kind": 32,
+					"children": [
+						53,
+						18,
+						36,
+						41,
+						13,
+						31,
+						30,
+						48,
+						8
+					]
+				}
+			]
+		},
+		{
+			"id": 57,
+			"name": "IOOutcome",
+			"kind": 4,
+			"kindString": "Enumeration",
+			"flags": {},
+			"children": [
+				{
+					"id": 59,
+					"name": "Raised",
+					"kind": 16,
+					"kindString": "Enumeration member",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 14,
+							"character": 8
+						}
+					],
+					"defaultValue": "1"
+				},
+				{
+					"id": 58,
+					"name": "Succeeded",
+					"kind": 16,
+					"kindString": "Enumeration member",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 13,
+							"character": 11
+						}
+					],
+					"defaultValue": "0"
+				}
+			],
+			"groups": [
+				{
+					"title": "Enumeration members",
+					"kind": 16,
+					"children": [
+						59,
+						58
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 12,
+					"character": 21
+				}
+			]
+		},
+		{
+			"id": 82,
+			"name": "IOBase",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {
+				"isAbstract": true
+			},
+			"children": [
+				{
+					"id": 83,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {},
+					"signatures": [
+						{
+							"id": 84,
+							"name": "new IOBase",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 85,
+									"name": "A",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								},
+								{
+									"id": 86,
+									"name": "E",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {},
+									"default": {
+										"type": "intrinsic",
+										"name": "unknown"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 82,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IOBase"
+							}
+						}
+					]
+				},
+				{
+					"id": 91,
+					"name": "andThen",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 64,
+							"character": 9
+						}
+					],
+					"signatures": [
+						{
+							"id": 92,
+							"name": "andThen",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 93,
+									"name": "B",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								},
+								{
+									"id": 94,
+									"name": "E2",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 95,
+									"name": "next",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 96,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 97,
+													"name": "__type",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 98,
+															"name": "a",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "reference",
+																"name": "A"
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "reference",
+																"name": "B"
+															},
+															{
+																"type": "reference",
+																"name": "E2"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "B"
+									},
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"name": "E"
+											},
+											{
+												"type": "reference",
+												"name": "E2"
+											}
+										]
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 129,
+					"name": "as",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 84,
+							"character": 4
+						}
+					],
+					"signatures": [
+						{
+							"id": 130,
+							"name": "as",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 131,
+									"name": "B",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 132,
+									"name": "value",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reference",
+										"name": "B"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "B"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 106,
+					"name": "catch",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 72,
+							"character": 7
+						}
+					],
+					"signatures": [
+						{
+							"id": 107,
+							"name": "catch",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 108,
+									"name": "B",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								},
+								{
+									"id": 109,
+									"name": "E2",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 110,
+									"name": "catcher",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 111,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 112,
+													"name": "__type",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 113,
+															"name": "e",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "reference",
+																"name": "E"
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "reference",
+																"name": "B"
+															},
+															{
+																"type": "reference",
+																"name": "E2"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"name": "A"
+											},
+											{
+												"type": "reference",
+												"name": "B"
+											}
+										]
+									},
+									{
+										"type": "reference",
+										"name": "E2"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 135,
+					"name": "delay",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 93,
+							"character": 7
+						}
+					],
+					"signatures": [
+						{
+							"id": 136,
+							"name": "delay",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"parameters": [
+								{
+									"id": 137,
+									"name": "time",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 138,
+									"name": "units",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "literal",
+												"value": "millisecond"
+											},
+											{
+												"type": "literal",
+												"value": "milliseconds"
+											},
+											{
+												"type": "literal",
+												"value": "seconds"
+											},
+											{
+												"type": "literal",
+												"value": "second"
+											},
+											{
+												"type": "literal",
+												"value": "minute"
+											},
+											{
+												"type": "literal",
+												"value": "minutes"
+											},
+											{
+												"type": "literal",
+												"value": "hour"
+											},
+											{
+												"type": "literal",
+												"value": "hours"
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 99,
+					"name": "map",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 68,
+							"character": 5
+						}
+					],
+					"signatures": [
+						{
+							"id": 100,
+							"name": "map",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 101,
+									"name": "B",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 102,
+									"name": "mapping",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 103,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 104,
+													"name": "__type",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 105,
+															"name": "a",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "reference",
+																"name": "A"
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"name": "B"
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "B"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 114,
+					"name": "mapError",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 76,
+							"character": 10
+						}
+					],
+					"signatures": [
+						{
+							"id": 115,
+							"name": "mapError",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 116,
+									"name": "E2",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 117,
+									"name": "mapping",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 118,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 119,
+													"name": "__type",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 120,
+															"name": "e",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "reference",
+																"name": "E"
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"name": "E2"
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "reference",
+										"name": "E2"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 133,
+					"name": "repeatForever",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 89,
+							"character": 15
+						}
+					],
+					"signatures": [
+						{
+							"id": 134,
+							"name": "repeatForever",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "intrinsic",
+										"name": "never"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 143,
+					"name": "retry",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 115,
+							"character": 7
+						}
+					],
+					"signatures": [
+						{
+							"id": 144,
+							"name": "retry",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"comment": {
+								"shortText": "Re-run the IO if it raises an error, up to the given number of times."
+							},
+							"parameters": [
+								{
+									"id": 145,
+									"name": "retryCount",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IO"
+							}
+						},
+						{
+							"id": 146,
+							"name": "retry",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"parameters": [
+								{
+									"id": 147,
+									"name": "options",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reference",
+										"id": 69,
+										"typeArguments": [
+											{
+												"type": "reference",
+												"name": "E"
+											}
+										],
+										"name": "RetryOptions"
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "reference",
+										"name": "E"
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 89,
+					"name": "run",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 55,
+							"character": 11
+						}
+					],
+					"signatures": [
+						{
+							"id": 90,
+							"name": "run",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					]
+				},
+				{
+					"id": 87,
+					"name": "runSafe",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isAbstract": true
+					},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 53,
+							"character": 18
+						}
+					],
+					"signatures": [
+						{
+							"id": 88,
+							"name": "runSafe",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"id": 60,
+										"typeArguments": [
+											{
+												"type": "reference",
+												"name": "A"
+											},
+											{
+												"type": "reference",
+												"name": "E"
+											}
+										],
+										"name": "IOResult"
+									}
+								],
+								"name": "Promise"
+							}
+						}
+					]
+				},
+				{
+					"id": 121,
+					"name": "through",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 80,
+							"character": 9
+						}
+					],
+					"signatures": [
+						{
+							"id": 122,
+							"name": "through",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"typeParameter": [
+								{
+									"id": 123,
+									"name": "B",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								},
+								{
+									"id": 124,
+									"name": "E2",
+									"kind": 131072,
+									"kindString": "Type parameter",
+									"flags": {}
+								}
+							],
+							"parameters": [
+								{
+									"id": 125,
+									"name": "next",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "reflection",
+										"declaration": {
+											"id": 126,
+											"name": "__type",
+											"kind": 65536,
+											"kindString": "Type literal",
+											"flags": {},
+											"signatures": [
+												{
+													"id": 127,
+													"name": "__type",
+													"kind": 4096,
+													"kindString": "Call signature",
+													"flags": {},
+													"parameters": [
+														{
+															"id": 128,
+															"name": "a",
+															"kind": 32768,
+															"kindString": "Parameter",
+															"flags": {},
+															"type": {
+																"type": "reference",
+																"name": "A"
+															}
+														}
+													],
+													"type": {
+														"type": "reference",
+														"id": 1,
+														"typeArguments": [
+															{
+																"type": "reference",
+																"name": "B"
+															},
+															{
+																"type": "reference",
+																"name": "E2"
+															}
+														],
+														"name": "IO"
+													}
+												}
+											]
+										}
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"name": "E"
+											},
+											{
+												"type": "reference",
+												"name": "E2"
+											}
+										]
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				},
+				{
+					"id": 139,
+					"name": "timeout",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {},
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 101,
+							"character": 9
+						}
+					],
+					"signatures": [
+						{
+							"id": 140,
+							"name": "timeout",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {},
+							"parameters": [
+								{
+									"id": 141,
+									"name": "time",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "intrinsic",
+										"name": "number"
+									}
+								},
+								{
+									"id": 142,
+									"name": "units",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {},
+									"type": {
+										"type": "union",
+										"types": [
+											{
+												"type": "literal",
+												"value": "millisecond"
+											},
+											{
+												"type": "literal",
+												"value": "milliseconds"
+											},
+											{
+												"type": "literal",
+												"value": "seconds"
+											},
+											{
+												"type": "literal",
+												"value": "second"
+											},
+											{
+												"type": "literal",
+												"value": "minute"
+											},
+											{
+												"type": "literal",
+												"value": "minutes"
+											},
+											{
+												"type": "literal",
+												"value": "hour"
+											},
+											{
+												"type": "literal",
+												"value": "hours"
+											}
+										]
+									}
+								}
+							],
+							"type": {
+								"type": "reference",
+								"id": 1,
+								"typeArguments": [
+									{
+										"type": "reference",
+										"name": "A"
+									},
+									{
+										"type": "union",
+										"types": [
+											{
+												"type": "reference",
+												"name": "E"
+											},
+											{
+												"type": "reference",
+												"id": 151,
+												"name": "TimeoutError"
+											}
+										]
+									}
+								],
+								"name": "IO"
+							}
+						}
+					]
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						83
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						91,
+						129,
+						106,
+						135,
+						99,
+						114,
+						133,
+						143,
+						89,
+						87,
+						121,
+						139
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 52,
+					"character": 28
+				}
+			],
+			"typeParameter": [
+				{
+					"id": 148,
+					"name": "A",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {}
+				},
+				{
+					"id": 149,
+					"name": "E",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {},
+					"default": {
+						"type": "intrinsic",
+						"name": "unknown"
+					}
+				}
+			]
+		},
+		{
+			"id": 151,
+			"name": "TimeoutError",
+			"kind": 128,
+			"kindString": "Class",
+			"flags": {},
+			"children": [
+				{
+					"id": 162,
+					"name": "constructor",
+					"kind": 512,
+					"kindString": "Constructor",
+					"flags": {},
+					"signatures": [
+						{
+							"id": 163,
+							"name": "new TimeoutError",
+							"kind": 16384,
+							"kindString": "Constructor signature",
+							"flags": {},
+							"type": {
+								"type": "reference",
+								"id": 151,
+								"name": "TimeoutError"
+							},
+							"overwrites": {
+								"type": "reference",
+								"name": "Error.constructor"
+							}
+						}
+					],
+					"overwrites": {
+						"type": "reference",
+						"name": "Error.constructor"
+					}
+				},
+				{
+					"id": 165,
+					"name": "message",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExternal": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 974,
+							"character": 11
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"name": "Error.message"
+					}
+				},
+				{
+					"id": 164,
+					"name": "name",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExternal": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 973,
+							"character": 8
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"name": "Error.name"
+					}
+				},
+				{
+					"id": 166,
+					"name": "stack",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isExternal": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/typescript/lib/lib.es5.d.ts",
+							"line": 975,
+							"character": 9
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "string"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"name": "Error.stack"
+					}
+				},
+				{
+					"id": 156,
+					"name": "prepareStackTrace",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isStatic": true,
+						"isExternal": true,
+						"isOptional": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/@types/node/globals.d.ts",
+							"line": 11,
+							"character": 21
+						}
+					],
+					"type": {
+						"type": "reflection",
+						"declaration": {
+							"id": 157,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"signatures": [
+								{
+									"id": 158,
+									"name": "__type",
+									"kind": 4096,
+									"kindString": "Call signature",
+									"flags": {},
+									"comment": {
+										"shortText": "Optional override for formatting stack traces"
+									},
+									"parameters": [
+										{
+											"id": 159,
+											"name": "err",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "reference",
+												"name": "Error"
+											}
+										},
+										{
+											"id": 160,
+											"name": "stackTraces",
+											"kind": 32768,
+											"kindString": "Parameter",
+											"flags": {},
+											"type": {
+												"type": "array",
+												"elementType": {
+													"type": "reference",
+													"name": "CallSite"
+												}
+											}
+										}
+									],
+									"type": {
+										"type": "intrinsic",
+										"name": "any"
+									}
+								}
+							]
+						}
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"name": "Error.prepareStackTrace"
+					}
+				},
+				{
+					"id": 161,
+					"name": "stackTraceLimit",
+					"kind": 1024,
+					"kindString": "Property",
+					"flags": {
+						"isStatic": true,
+						"isExternal": true
+					},
+					"sources": [
+						{
+							"fileName": "node_modules/@types/node/globals.d.ts",
+							"line": 13,
+							"character": 19
+						}
+					],
+					"type": {
+						"type": "intrinsic",
+						"name": "number"
+					},
+					"inheritedFrom": {
+						"type": "reference",
+						"name": "Error.stackTraceLimit"
+					}
+				},
+				{
+					"id": 152,
+					"name": "captureStackTrace",
+					"kind": 2048,
+					"kindString": "Method",
+					"flags": {
+						"isStatic": true,
+						"isExternal": true
+					},
+					"signatures": [
+						{
+							"id": 153,
+							"name": "captureStackTrace",
+							"kind": 4096,
+							"kindString": "Call signature",
+							"flags": {
+								"isExternal": true
+							},
+							"comment": {
+								"shortText": "Create .stack property on a target object"
+							},
+							"parameters": [
+								{
+									"id": 154,
+									"name": "targetObject",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExternal": true
+									},
+									"type": {
+										"type": "intrinsic",
+										"name": "object"
+									}
+								},
+								{
+									"id": 155,
+									"name": "constructorOpt",
+									"kind": 32768,
+									"kindString": "Parameter",
+									"flags": {
+										"isExternal": true,
+										"isOptional": true
+									},
+									"type": {
+										"type": "reference",
+										"name": "Function"
+									}
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "void"
+							},
+							"inheritedFrom": {
+								"type": "reference",
+								"name": "Error.captureStackTrace"
+							}
+						}
+					],
+					"inheritedFrom": {
+						"type": "reference",
+						"name": "Error.captureStackTrace"
+					}
+				}
+			],
+			"groups": [
+				{
+					"title": "Constructors",
+					"kind": 512,
+					"children": [
+						162
+					]
+				},
+				{
+					"title": "Properties",
+					"kind": 1024,
+					"children": [
+						165,
+						164,
+						166,
+						156,
+						161
+					]
+				},
+				{
+					"title": "Methods",
+					"kind": 2048,
+					"children": [
+						152
+					]
+				}
+			],
+			"sources": [
+				{
+					"fileName": "src/errors.ts",
+					"line": 1,
+					"character": 25
+				}
+			],
+			"extendedTypes": [
+				{
+					"type": "reference",
+					"name": "Error"
+				}
+			]
+		},
+		{
+			"id": 54,
+			"name": "IO",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 5,
+					"character": 14
+				}
+			],
+			"typeParameter": [
+				{
+					"id": 55,
+					"name": "A",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {}
+				},
+				{
+					"id": 56,
+					"name": "E",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {},
+					"default": {
+						"type": "intrinsic",
+						"name": "unknown"
+					}
+				}
+			],
+			"type": {
+				"type": "union",
+				"types": [
+					{
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "A"
+							},
+							{
+								"type": "reference",
+								"name": "E"
+							}
+						],
+						"name": "Wrap"
+					},
+					{
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "A"
+							},
+							{
+								"type": "reference",
+								"name": "E"
+							}
+						],
+						"name": "Defer"
+					},
+					{
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "A"
+							},
+							{
+								"type": "reference",
+								"name": "E"
+							},
+							{
+								"type": "intrinsic",
+								"name": "any"
+							},
+							{
+								"type": "reference",
+								"name": "E"
+							}
+						],
+						"name": "AndThen"
+					},
+					{
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "A"
+							},
+							{
+								"type": "reference",
+								"name": "E"
+							}
+						],
+						"name": "Raise"
+					},
+					{
+						"type": "reference",
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "A"
+							},
+							{
+								"type": "reference",
+								"name": "E"
+							},
+							{
+								"type": "intrinsic",
+								"name": "any"
+							},
+							{
+								"type": "intrinsic",
+								"name": "any"
+							},
+							{
+								"type": "intrinsic",
+								"name": "any"
+							}
+						],
+						"name": "Catch"
+					}
+				]
+			}
+		},
+		{
+			"id": 60,
+			"name": "IOResult",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 17,
+					"character": 20
+				}
+			],
+			"typeParameter": [
+				{
+					"id": 67,
+					"name": "A",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {}
+				},
+				{
+					"id": 68,
+					"name": "E",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {}
+				}
+			],
+			"type": {
+				"type": "union",
+				"types": [
+					{
+						"type": "reflection",
+						"declaration": {
+							"id": 61,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"children": [
+								{
+									"id": 62,
+									"name": "outcome",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "src/io.ts",
+											"line": 18,
+											"character": 13
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 58,
+										"name": "IOOutcome.Succeeded"
+									}
+								},
+								{
+									"id": 63,
+									"name": "value",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "src/io.ts",
+											"line": 18,
+											"character": 41
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "A"
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Properties",
+									"kind": 1024,
+									"children": [
+										62,
+										63
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 18,
+									"character": 3
+								}
+							]
+						}
+					},
+					{
+						"type": "reflection",
+						"declaration": {
+							"id": 64,
+							"name": "__type",
+							"kind": 65536,
+							"kindString": "Type literal",
+							"flags": {},
+							"children": [
+								{
+									"id": 65,
+									"name": "outcome",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "src/io.ts",
+											"line": 19,
+											"character": 13
+										}
+									],
+									"type": {
+										"type": "reference",
+										"id": 59,
+										"name": "IOOutcome.Raised"
+									}
+								},
+								{
+									"id": 66,
+									"name": "value",
+									"kind": 1024,
+									"kindString": "Property",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "src/io.ts",
+											"line": 19,
+											"character": 38
+										}
+									],
+									"type": {
+										"type": "reference",
+										"name": "E"
+									}
+								}
+							],
+							"groups": [
+								{
+									"title": "Properties",
+									"kind": 1024,
+									"children": [
+										65,
+										66
+									]
+								}
+							],
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 19,
+									"character": 3
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		{
+			"id": 72,
+			"name": "RetryOptions",
+			"kind": 4194304,
+			"kindString": "Type alias",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 21,
+					"character": 24
+				}
+			],
+			"typeParameter": [
+				{
+					"id": 81,
+					"name": "E",
+					"kind": 131072,
+					"kindString": "Type parameter",
+					"flags": {},
+					"default": {
+						"type": "intrinsic",
+						"name": "unknown"
+					}
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 73,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 80,
+							"name": "backoff",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The factor to multiply the delay by after each failed attempt."
+							},
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 39,
+									"character": 9
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 74,
+							"name": "count",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"comment": {
+								"shortText": "The number of times to retry."
+							},
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 23,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "intrinsic",
+								"name": "number"
+							}
+						},
+						{
+							"id": 79,
+							"name": "delay",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"comment": {
+								"shortText": "The time to wait after each failed attempt before retrying."
+							},
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 34,
+									"character": 7
+								}
+							],
+							"type": {
+								"type": "reference",
+								"name": "Duration"
+							}
+						},
+						{
+							"id": 75,
+							"name": "filter",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {
+								"isOptional": true
+							},
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 29,
+									"character": 8
+								}
+							],
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 76,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "src/io.ts",
+											"line": 29,
+											"character": 10
+										}
+									],
+									"signatures": [
+										{
+											"id": 77,
+											"name": "__type",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {},
+											"comment": {
+												"shortText": "A predicate which will be called to decide whether a\nraised error should be retried."
+											},
+											"parameters": [
+												{
+													"id": 78,
+													"name": "error",
+													"kind": 32768,
+													"kindString": "Parameter",
+													"flags": {},
+													"type": {
+														"type": "reference",
+														"name": "E"
+													}
+												}
+											],
+											"type": {
+												"type": "intrinsic",
+												"name": "boolean"
+											}
+										}
+									]
+								}
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								80,
+								74,
+								79,
+								75
+							]
+						}
+					],
+					"sources": [
+						{
+							"fileName": "src/io.ts",
+							"line": 21,
+							"character": 39
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 69,
+			"name": "RetryOptions",
+			"kind": 32,
+			"kindString": "Variable",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 42,
+					"character": 25
+				}
+			],
+			"type": {
+				"type": "reflection",
+				"declaration": {
+					"id": 70,
+					"name": "__type",
+					"kind": 65536,
+					"kindString": "Type literal",
+					"flags": {},
+					"children": [
+						{
+							"id": 71,
+							"name": "defaults",
+							"kind": 1024,
+							"kindString": "Property",
+							"flags": {},
+							"sources": [
+								{
+									"fileName": "src/io.ts",
+									"line": 43,
+									"character": 10
+								}
+							],
+							"type": {
+								"type": "reference",
+								"typeArguments": [
+									{
+										"type": "reference",
+										"typeArguments": [
+											{
+												"type": "reference",
+												"id": 69,
+												"typeArguments": [
+													{
+														"type": "intrinsic",
+														"name": "unknown"
+													}
+												],
+												"name": "RetryOptions"
+											}
+										],
+										"name": "Required"
+									},
+									{
+										"type": "literal",
+										"value": "count"
+									}
+								],
+								"name": "Omit"
+							}
+						}
+					],
+					"groups": [
+						{
+							"title": "Properties",
+							"kind": 1024,
+							"children": [
+								71
+							]
+						}
+					]
+				}
+			}
+		},
+		{
+			"id": 1,
+			"name": "IO",
+			"kind": 64,
+			"kindString": "Function",
+			"flags": {},
+			"sources": [
+				{
+					"fileName": "src/io.ts",
+					"line": 257,
+					"character": 18
+				}
+			],
+			"signatures": [
+				{
+					"id": 2,
+					"name": "IO",
+					"kind": 4096,
+					"kindString": "Call signature",
+					"flags": {},
+					"typeParameter": [
+						{
+							"id": 3,
+							"name": "A",
+							"kind": 131072,
+							"kindString": "Type parameter",
+							"flags": {}
+						}
+					],
+					"parameters": [
+						{
+							"id": 4,
+							"name": "effect",
+							"kind": 32768,
+							"kindString": "Parameter",
+							"flags": {},
+							"type": {
+								"type": "reflection",
+								"declaration": {
+									"id": 5,
+									"name": "__type",
+									"kind": 65536,
+									"kindString": "Type literal",
+									"flags": {},
+									"sources": [
+										{
+											"fileName": "src/io.ts",
+											"line": 257,
+											"character": 29
+										}
+									],
+									"signatures": [
+										{
+											"id": 6,
+											"name": "__type",
+											"kind": 4096,
+											"kindString": "Call signature",
+											"flags": {},
+											"type": {
+												"type": "union",
+												"types": [
+													{
+														"type": "reference",
+														"typeArguments": [
+															{
+																"type": "reference",
+																"name": "A"
+															}
+														],
+														"name": "Promise"
+													},
+													{
+														"type": "reference",
+														"name": "A"
+													}
+												]
+											}
+										}
+									]
+								}
+							}
+						}
+					],
+					"type": {
+						"type": "reference",
+						"id": 1,
+						"typeArguments": [
+							{
+								"type": "reference",
+								"name": "A"
+							},
+							{
+								"type": "intrinsic",
+								"name": "unknown"
+							}
+						],
+						"name": "IO"
+					}
+				}
+			]
+		}
+	],
+	"groups": [
+		{
+			"title": "References",
+			"kind": 16777216,
+			"children": [
+				150
+			]
+		},
+		{
+			"title": "Namespaces",
+			"kind": 2,
+			"children": [
+				7
+			]
+		},
+		{
+			"title": "Enumerations",
+			"kind": 4,
+			"children": [
+				57
+			]
+		},
+		{
+			"title": "Classes",
+			"kind": 128,
+			"children": [
+				82,
+				151
+			]
+		},
+		{
+			"title": "Type aliases",
+			"kind": 4194304,
+			"children": [
+				54,
+				60,
+				72
+			]
+		},
+		{
+			"title": "Variables",
+			"kind": 32,
+			"children": [
+				69
+			]
+		},
+		{
+			"title": "Functions",
+			"kind": 64,
+			"children": [
+				1
+			]
+		}
+	],
+	"sources": [
+		{
+			"fileName": "src/io.ts",
+			"line": 1,
+			"character": 0
+		}
+	]
+}

@@ -2,7 +2,7 @@ import { TimeoutError } from "./errors";
 
 export { TimeoutError };
 
-type IO<A, E = unknown> =
+export type IO<A, E = unknown> =
   | Wrap<A, E>
   | Defer<A, E>
   | AndThen<A, E, any, E>
@@ -49,7 +49,7 @@ export const RetryOptions: {
   },
 };
 
-abstract class IOBase<A, E = unknown> {
+export abstract class IOBase<A, E = unknown> {
   abstract runSafe(): Promise<IOResult<A, E>>;
 
   async run(): Promise<A> {
@@ -254,7 +254,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
   }
 }
 
-function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
+export function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(effect);
 }
 
@@ -456,9 +456,12 @@ IO.parallel = parallel;
 IO.race = race;
 IO.wait = wait;
 
-// This alias for setTimeout is used instead of calling the
-// global directly, so it can be replaced with intercepting
-// implementations in tests.
+/**
+ * @hidden
+ * This alias for setTimeout is used instead of calling the
+ * global directly, so it can be replaced with intercepting
+ * implementations in tests.
+ */
 IO._setTimeout = setTimeout;
 
 export default IO;
