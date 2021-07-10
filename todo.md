@@ -7,6 +7,7 @@
 - [x] correct type restrictions on errors
 - [x] sequence and parallel functions
 - [x] race function
+- [ ] finally method
 
 # Async, Concurrency & Fault Tolerance
 
@@ -15,8 +16,15 @@
 - [x] retry method
 - [x] exponential backoff for retry
 - [x] filter for retry
-- [ ] cancellation
-- [ ] fibers
+
+Cancellation & Fibers
+
+- [ ] Add Canceled to IOOutcome
+- [ ] Add cancellation behaviour to run loop
+- [ ] IO.fork method (alternatively Fiber.start?)
+- [ ] Fiber.cancel method
+- [ ] Fiber.join method
+- [ ] IO.cancel function for a fiber to self-cancel
 
 # Performance & Internals
 
