@@ -1,4 +1,4 @@
-import { TimeoutError } from "./errors";
+import { CancellationError, TimeoutError } from "./errors";
 
 export { TimeoutError };
 
@@ -7,16 +7,42 @@ type IO<A, E = unknown> =
   | Defer<A, E>
   | AndThen<A, E, any, E>
   | Raise<A, E>
-  | Catch<A, E, any, any, any>;
+  | Catch<A, E, any, any, any>
+  | Cancel<A, E>;
 
 export enum IOOutcome {
   Succeeded,
   Raised,
+  Canceled,
 }
 
 export type IOResult<A, E> =
   | { outcome: IOOutcome.Succeeded; value: A }
-  | { outcome: IOOutcome.Raised; value: E };
+  | { outcome: IOOutcome.Raised; value: E }
+  | { outcome: IOOutcome.Canceled };
+
+export const IOResult = {
+  Succeeded<A>(value: A): IOResult<A, never> {
+    return { outcome: IOOutcome.Succeeded, value };
+  },
+  Raised<E>(value: E): IOResult<never, E> {
+    return { outcome: IOOutcome.Raised, value };
+  },
+  Canceled: { outcome: IOOutcome.Canceled } as const,
+
+  toIO<A, E>(result: IOResult<A, E>): IO<A, E> {
+    switch (result.outcome) {
+      case IOOutcome.Succeeded:
+        return IO.wrap(result.value);
+
+      case IOOutcome.Raised:
+        return IO.raise(result.value);
+
+      case IOOutcome.Canceled:
+        return IO.cancel();
+    }
+  },
+};
 
 export type RetryOptions<E = unknown> = {
   /** The number of times to retry. */
@@ -54,10 +80,16 @@ abstract class IOBase<A, E = unknown> {
 
   async run(): Promise<A> {
     const result = await this.runSafe();
-    if (result.outcome === IOOutcome.Succeeded) {
-      return result.value;
-    } else {
-      throw result.value;
+
+    switch (result.outcome) {
+      case IOOutcome.Succeeded:
+        return result.value;
+
+      case IOOutcome.Raised:
+        throw result.value;
+
+      case IOOutcome.Canceled:
+        throw new CancellationError();
     }
   }
 
@@ -145,12 +177,8 @@ class Wrap<A, E> extends IOBase<A, E> {
     super();
   }
 
-  async run(): Promise<A> {
-    return this.value;
-  }
-
   async runSafe(): Promise<IOResult<A, E>> {
-    return { outcome: IOOutcome.Succeeded, value: this.value };
+    return IOResult.Succeeded(this.value);
   }
 }
 
@@ -159,18 +187,13 @@ class Defer<A, E> extends IOBase<A, E> {
     super();
   }
 
-  async run(): Promise<A> {
-    const effect = this.effect;
-    return effect();
-  }
-
   async runSafe(): Promise<IOResult<A, E>> {
     const effect = this.effect;
     try {
       const value = await effect();
-      return { outcome: IOOutcome.Succeeded, value };
+      return IOResult.Succeeded(value);
     } catch (e: unknown) {
-      return { outcome: IOOutcome.Raised, value: e as E };
+      return IOResult.Raised(e as E);
     }
   }
 }
@@ -181,21 +204,6 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     readonly next: (parentA: ParentA) => IO<A, E>
   ) {
     super();
-  }
-
-  async run(): Promise<A> {
-    // TODO attempt to find a way to implement this function
-    //      with type safety.
-
-    let io: IO<A, E> = this;
-
-    // Trampoline the andThen operation to ensure stack safety.
-    while (io instanceof AndThen) {
-      const { next, parent } = io as AndThen<any, any, any, any>;
-      const parentA = await parent.run();
-      io = next(parentA);
-    }
-    return io.run();
   }
 
   async runSafe(): Promise<IOResult<A, E>> {
@@ -223,12 +231,8 @@ class Raise<A, E> extends IOBase<A, E> {
     super();
   }
 
-  async run(): Promise<never> {
-    throw this.error;
-  }
-
   async runSafe(): Promise<IOResult<A, E>> {
-    return { outcome: IOOutcome.Raised, value: this.error };
+    return IOResult.Raised(this.error);
   }
 }
 
@@ -245,12 +249,18 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
 
   async runSafe(): Promise<IOResult<A, E>> {
     const parentResult = await this.parent.runSafe();
-    if (parentResult.outcome === IOOutcome.Succeeded) {
-      return parentResult;
-    } else {
+    if (parentResult.outcome === IOOutcome.Raised) {
       const catcher = this.catcher;
       return catcher(parentResult.value).runSafe();
+    } else {
+      return parentResult;
     }
+  }
+}
+
+class Cancel<A, E> extends IOBase<A, E> {
+  async runSafe(): Promise<IOResult<A, E>> {
+    return IOResult.Canceled;
   }
 }
 
@@ -264,6 +274,13 @@ function wrap<A>(value: A): IO<A, never> {
 
 function raise<E>(error: E): IO<never, E> {
   return new Raise(error);
+}
+
+/**
+ * Cancels the execution of the current fiber.
+ */
+function cancel(): IO<never, never> {
+  return new Cancel();
 }
 
 // TODO rename this function?
@@ -345,10 +362,11 @@ function parallel<Actions extends IOArray>(
             resolvedCount += 1;
             if (
               safeResult.outcome === IOOutcome.Raised ||
+              safeResult.outcome === IOOutcome.Canceled ||
               resolvedCount === actions.length
             ) {
               // Either all actions have completed successfully, or one of
-              // them has raised, so we resolve the promise.
+              // them has raised or canceled, so we resolve the promise.
 
               // eventually it should cancel the outstanding actions here.
               resolve(safeResults);
@@ -368,10 +386,16 @@ function parallel<Actions extends IOArray>(
       const succeeded = [];
       for (const safeResult of safeResults) {
         if (safeResult !== undefined) {
-          if (safeResult.outcome === IOOutcome.Succeeded) {
-            succeeded.push(safeResult.value);
-          } else {
-            return IO.raise(safeResult.value as UnionOfErrors<Actions>);
+          switch (safeResult.outcome) {
+            case IOOutcome.Succeeded:
+              succeeded.push(safeResult.value);
+              break;
+
+            case IOOutcome.Raised:
+              return IO.raise(safeResult.value as UnionOfErrors<Actions>);
+
+            case IOOutcome.Canceled:
+              return IO.cancel();
           }
         }
       }
@@ -400,6 +424,9 @@ function race<Actions extends IOArray>(
       Actions extends { [0]: unknown } ? never : TypeError
     >;
   }
+
+  // TODO ignore cancellations unless all fibers have been canceled.
+
   return IO(
     () =>
       new Promise<IOResult<UnionOfValues<Actions>, UnionOfErrors<Actions>>>(
@@ -419,11 +446,7 @@ function race<Actions extends IOArray>(
         throw unsoundlyThrownError;
       }
     )
-    .andThen((safeResult) =>
-      safeResult.outcome === IOOutcome.Succeeded
-        ? IO.wrap(safeResult.value)
-        : IO.raise(safeResult.value)
-    );
+    .andThen(IOResult.toIO);
 }
 
 const TIME_UNIT_FACTORS = {
@@ -449,6 +472,7 @@ function wait(time: number, units: TimeUnits): IO<void, never> {
 
 IO.wrap = wrap;
 IO.raise = raise;
+IO.cancel = cancel;
 IO.lift = lift;
 IO.void = IO.wrap<void>(undefined);
 IO.sequence = sequence;

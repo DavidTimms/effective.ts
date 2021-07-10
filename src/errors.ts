@@ -3,3 +3,9 @@ export class TimeoutError extends Error {
     super("Time limit exceeded");
   }
 }
+
+export class CancellationError extends Error {
+  constructor() {
+    super("Execution of this fiber was canceled");
+  }
+}

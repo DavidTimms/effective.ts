@@ -17,20 +17,23 @@
 - [x] exponential backoff for retry
 - [x] filter for retry
 
-Cancellation & Fibers
+# Cancellation & Fibers
 
-- [ ] Add Canceled to IOOutcome
-- [ ] Add cancellation behaviour to run loop
+- [x] Add Canceled to IOOutcome
+- [x] Add cancellation behaviour to run loop
+- [ ] Add a way to interoperate with other cancellation mechanism e.g. `clearTimeout`
 - [ ] IO.fork method (alternatively Fiber.start?)
 - [ ] Fiber.cancel method
 - [ ] Fiber.join method
-- [ ] IO.cancel function for a fiber to self-cancel
+- [ ] Rewrite `parallel` and `race` using fibers
+- [x] IO.cancel function for a fiber to self-cancel
 
 # Performance & Internals
 
 - [x] make recursive IO stack-safe
 - [ ] optimise to avoid creation of unnecessary promises
 - [ ] write some useful benchmarks - compare async/await/throw implementation to IO
+- [ ] Re-use the `Wrap`, `Raise` and `Cancel` class as the cases of `IOResult` to avoid allocations?
 
 # Code Organisation
 
