@@ -1,6 +1,8 @@
 import { CancellationError, TimeoutError } from "./errors";
+import { Fiber } from "./fiber";
 
 export { TimeoutError };
+export { Fiber };
 
 export type IO<A, E = unknown> =
   | Wrap<A, E>
@@ -76,9 +78,13 @@ export const RetryOptions: {
 };
 
 abstract class IOBase<A, E = unknown> {
-  abstract runSafe(): Promise<IOResult<A, E>>;
+  protected abstract executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>>;
 
-  async run(): Promise<A> {
+  async runSafe(this: IO<A, E>): Promise<IOResult<A, E>> {
+    return new Fiber(this)["promise"];
+  }
+
+  async run(this: IO<A, E>): Promise<A> {
     const result = await this.runSafe();
 
     switch (result.outcome) {
@@ -171,6 +177,10 @@ abstract class IOBase<A, E = unknown> {
     return nextAttempt(0);
   }
 
+  /**
+   * This method type-casts any errors raised by this IO to the given type.
+   * This can easily cause type unsoundness problems, so use with care.
+   */
   castError<CastedError>(): IO<A, CastedError> {
     return (this as unknown) as IO<A, CastedError>;
   }
@@ -181,7 +191,7 @@ class Wrap<A, E> extends IOBase<A, E> {
     super();
   }
 
-  async runSafe(): Promise<IOResult<A, E>> {
+  protected async executeOn(): Promise<IOResult<A, E>> {
     return IOResult.Succeeded(this.value);
   }
 }
@@ -191,7 +201,7 @@ class Defer<A, E> extends IOBase<A, E> {
     super();
   }
 
-  async runSafe(): Promise<IOResult<A, E>> {
+  protected async executeOn(): Promise<IOResult<A, E>> {
     const effect = this.effect;
     try {
       const value = await effect();
@@ -210,7 +220,7 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     super();
   }
 
-  async runSafe(): Promise<IOResult<A, E>> {
+  protected async executeOn(): Promise<IOResult<A, E>> {
     // TODO attempt to find a way to implement this function
     //      with type safety.
 
@@ -235,7 +245,7 @@ class Raise<A, E> extends IOBase<A, E> {
     super();
   }
 
-  async runSafe(): Promise<IOResult<A, E>> {
+  protected async executeOn(): Promise<IOResult<A, E>> {
     return IOResult.Raised(this.error);
   }
 }
@@ -251,7 +261,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
     super();
   }
 
-  async runSafe(): Promise<IOResult<A, E>> {
+  protected async executeOn(): Promise<IOResult<A, E>> {
     const parentResult = await this.parent.runSafe();
     if (parentResult.outcome === IOOutcome.Raised) {
       const catcher = this.catcher;
@@ -263,7 +273,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
 }
 
 class Cancel<A, E> extends IOBase<A, E> {
-  async runSafe(): Promise<IOResult<A, E>> {
+  protected async executeOn(): Promise<IOResult<A, E>> {
     return IOResult.Canceled;
   }
 }
@@ -489,5 +499,4 @@ IO.wait = wait;
 // implementations in tests.
 IO._setTimeout = setTimeout;
 
-export { Fiber } from "./fiber";
 export default IO;
