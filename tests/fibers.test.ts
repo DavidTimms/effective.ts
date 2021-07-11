@@ -73,3 +73,34 @@ describe("The Fiber.outcome method", () => {
     await expect(io.run()).resolves.toEqual(IOResult.Canceled);
   });
 });
+
+describe("The Fiber.cancel method", () => {
+  it("returns an IO which stops the execution of the fiber", async () => {
+    let count = 0;
+
+    const fiberProgram = IO(() => (count += 1))
+      .delay(20, "milliseconds")
+      .repeatForever();
+
+    const io = Fiber.start(fiberProgram)
+      .through(() => IO.wait(50, "milliseconds"))
+      .andThen((fiber) => fiber.cancel())
+      .andThen(() => IO.wait(50, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(count).toBe(2);
+  });
+
+  it("returns an IO which makes the outcome of the fiber 'Canceled'", async () => {
+    const fiberProgram = IO.wrap(123).delay(1, "second");
+
+    const io = Fiber.start(fiberProgram)
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.runSafe();
+
+    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Canceled));
+  });
+});

@@ -201,14 +201,20 @@ class Defer<A, E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
     const effect = this.effect;
-    try {
-      const value = await effect();
-      return IOResult.Succeeded(value);
-    } catch (e: unknown) {
-      return IOResult.Raised(e as E);
-    }
+
+    return new Promise(async (resolve) => {
+      fiber["cancelCurrentEffect"] = () => resolve(IOResult.Canceled);
+      try {
+        const value = await effect();
+        fiber["cancelCurrentEffect"] = null;
+        resolve(IOResult.Succeeded(value));
+      } catch (e: unknown) {
+        fiber["cancelCurrentEffect"] = null;
+        resolve(IOResult.Raised(e as E));
+      }
+    });
   }
 }
 
@@ -220,23 +226,26 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
     // TODO attempt to find a way to implement this function
     //      with type safety.
+
+    // Are there other boundaries where we need to check for cancellation?
+    if (fiber["isCanceled"]) return IOResult.Canceled;
 
     let io: IO<A, E> = this;
 
     // Trampoline the andThen operation to ensure stack safety.
     while (io instanceof AndThen) {
       const { next, parent } = io as AndThen<any, any, any, any>;
-      const result = await parent.runSafe();
+      const result = await fiber._execute(parent);
       if (result.outcome === IOOutcome.Succeeded) {
         io = next(result.value);
       } else {
         return result;
       }
     }
-    return io.runSafe();
+    return fiber._execute(io);
   }
 }
 
@@ -261,11 +270,11 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
     super();
   }
 
-  protected async executeOn(): Promise<IOResult<A, E>> {
-    const parentResult = await this.parent.runSafe();
+  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+    const parentResult = await fiber._execute(this.parent);
     if (parentResult.outcome === IOOutcome.Raised) {
       const catcher = this.catcher;
-      return catcher(parentResult.value).runSafe();
+      return fiber._execute(catcher(parentResult.value));
     } else {
       return parentResult;
     }

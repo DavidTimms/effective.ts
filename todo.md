@@ -21,10 +21,10 @@
 
 - [x] Add Canceled to IOOutcome
 - [x] Add cancellation behaviour to run loop
-- [ ] Add a way to interoperate with other cancellation mechanism e.g. `clearTimeout`
+- [ ] Add a way to interoperate with other cancellation mechanisms e.g. `clearTimeout`
 - [x] Fiber.start function
-- [ ] Fiber.cancel method
-- [ ] Fiber.join method
+- [x] Fiber.cancel method
+- [x] Fiber.outcome method
 - [ ] Rewrite `parallel` and `race` using fibers
 - [x] IO.cancel function for a fiber to self-cancel
 
