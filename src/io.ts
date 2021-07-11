@@ -2,7 +2,7 @@ import { CancellationError, TimeoutError } from "./errors";
 
 export { TimeoutError };
 
-type IO<A, E = unknown> =
+export type IO<A, E = unknown> =
   | Wrap<A, E>
   | Defer<A, E>
   | AndThen<A, E, any, E>
@@ -170,6 +170,10 @@ abstract class IOBase<A, E = unknown> {
 
     return nextAttempt(0);
   }
+
+  castError<CastedError>(): IO<A, CastedError> {
+    return (this as unknown) as IO<A, CastedError>;
+  }
 }
 
 class Wrap<A, E> extends IOBase<A, E> {
@@ -264,7 +268,7 @@ class Cancel<A, E> extends IOBase<A, E> {
   }
 }
 
-function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
+export function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(effect);
 }
 
@@ -485,4 +489,5 @@ IO.wait = wait;
 // implementations in tests.
 IO._setTimeout = setTimeout;
 
+export { Fiber } from "./fiber";
 export default IO;
