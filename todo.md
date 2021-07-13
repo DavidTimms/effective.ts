@@ -22,11 +22,13 @@
 - [x] Add Canceled to IOOutcome
 - [x] Add cancellation behaviour to run loop
 - [ ] Add a way to interoperate with other cancellation mechanisms e.g. `clearTimeout`
+- [ ] Support async `cancel` callbacks for `IO.cancelable`
 - [x] Fiber.start function
 - [x] Fiber.cancel method
 - [x] Fiber.outcome method
 - [ ] Rewrite `parallel` and `race` using fibers
 - [x] IO.cancel function for a fiber to self-cancel
+- [ ] `IO.onCancel` method for resource cleanup (do we need a full-blown bracket/resource construct?)
 
 # Performance & Internals
 

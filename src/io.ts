@@ -197,7 +197,12 @@ class Wrap<A, E> extends IOBase<A, E> {
 }
 
 class Defer<A, E> extends IOBase<A, E> {
-  constructor(private readonly effect: () => Promise<A> | A) {
+  constructor(
+    private readonly effect: () => {
+      promise: Promise<A>;
+      cancel: (() => void) | null;
+    }
+  ) {
     super();
   }
 
@@ -205,9 +210,20 @@ class Defer<A, E> extends IOBase<A, E> {
     const effect = this.effect;
 
     return new Promise(async (resolve) => {
-      fiber["cancelCurrentEffect"] = () => resolve(IOResult.Canceled);
       try {
-        const value = await effect();
+        const { promise, cancel } = effect();
+        fiber["cancelCurrentEffect"] = () => {
+          try {
+            if (cancel) cancel();
+          } catch (e) {
+            // If the cancel function throws, the IO outcome is "raised"
+            // instead of 'canceled'. This stops cancellation errors from
+            // being silently ignored.
+            resolve(IOResult.Raised(e as E));
+          }
+          resolve(IOResult.Canceled);
+        };
+        const value = await promise;
         fiber["cancelCurrentEffect"] = null;
         resolve(IOResult.Succeeded(value));
       } catch (e: unknown) {
@@ -285,7 +301,16 @@ class Cancel<A, E> extends IOBase<A, E> {
 }
 
 export function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
-  return new Defer(effect);
+  return new Defer(() => ({
+    promise: Promise.resolve(effect()),
+    cancel: null,
+  }));
+}
+
+function cancelable<A>(
+  cancelableEffect: () => { promise: Promise<A>; cancel: () => void }
+): IO<A, unknown> {
+  return new Defer(cancelableEffect);
 }
 
 function wrap<A>(value: A): IO<A, never> {
@@ -490,6 +515,7 @@ function wait(time: number, units: TimeUnits): IO<void, never> {
   ) as IO<void, never>;
 }
 
+IO.cancelable = cancelable;
 IO.wrap = wrap;
 IO.raise = raise;
 IO.cancel = cancel;
