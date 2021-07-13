@@ -103,4 +103,54 @@ describe("The Fiber.cancel method", () => {
 
     expect(outcome).toEqual(IOResult.Succeeded(IOResult.Canceled));
   });
+
+  it("does not affect the outcome of the fiber if it has already succeeded", async () => {
+    const fiberProgram = IO.wrap(123);
+
+    const io = Fiber.start(fiberProgram)
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.runSafe();
+
+    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Succeeded(123)));
+  });
+
+  it("does not affect the outcome of the fiber if it has already succeeded with an async step", async () => {
+    const fiberProgram = IO.wrap(123).delay(10, "milliseconds");
+
+    const io = Fiber.start(fiberProgram)
+      .through((fiber) => fiber.outcome())
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.runSafe();
+
+    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Succeeded(123)));
+  });
+
+  it("does not affect the outcome of the fiber if it has already raised", async () => {
+    const fiberProgram = IO.raise("an error");
+
+    const io = Fiber.start(fiberProgram)
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.runSafe();
+
+    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Raised("an error")));
+  });
+
+  it("has no effect if the fiber is already canceled", async () => {
+    const fiberProgram = IO.wrap(true).delay(2, "seconds");
+
+    const io = Fiber.start(fiberProgram)
+      .through((fiber) => fiber.cancel())
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.runSafe();
+
+    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Canceled));
+  });
 });

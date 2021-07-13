@@ -230,9 +230,6 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     // TODO attempt to find a way to implement this function
     //      with type safety.
 
-    // Are there other boundaries where we need to check for cancellation?
-    if (fiber["isCanceled"]) return IOResult.Canceled;
-
     let io: IO<A, E> = this;
 
     // Trampoline the andThen operation to ensure stack safety.

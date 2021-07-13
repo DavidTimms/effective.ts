@@ -1,11 +1,11 @@
 import { IO, IOResult } from "./io";
 
 export class Fiber<A, E> {
+  // Assign each fiber a unique ID for debugging.
   private static nextId = 0;
   id = Fiber.nextId++;
 
   private cancelCurrentEffect: (() => void) | null = null;
-  private isCanceled = false;
   private readonly promise: Promise<IOResult<A, E>>;
 
   constructor(action: IO<A, E>) {
@@ -27,7 +27,6 @@ export class Fiber<A, E> {
 
   cancel(): IO<void, never> {
     return IO(() => {
-      this.isCanceled = true;
       if (this.cancelCurrentEffect) this.cancelCurrentEffect();
     }).castError<never>();
   }
