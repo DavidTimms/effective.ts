@@ -510,9 +510,16 @@ type Duration = readonly [number, TimeUnits];
 
 function wait(time: number, units: TimeUnits): IO<void, never> {
   const milliseconds = time * TIME_UNIT_FACTORS[units];
-  return IO(
-    () => new Promise((resolve) => IO._setTimeout(resolve, milliseconds))
-  ) as IO<void, never>;
+  return IO.cancelable(() => {
+    let handle: number | undefined = undefined;
+
+    return {
+      promise: new Promise((resolve) => {
+        handle = IO._setTimeout(resolve, milliseconds);
+      }),
+      cancel: () => clearTimeout(handle),
+    };
+  }) as IO<void, never>;
 }
 
 IO.cancelable = cancelable;
