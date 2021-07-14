@@ -142,6 +142,8 @@ describe("The IO.race function", () => {
       IO.raise(Error()),
     ]);
   });
+
+  it.todo("raises a cancellation error if all IOs cancel themselves");
 });
 
 describe("The repeatForever method", () => {

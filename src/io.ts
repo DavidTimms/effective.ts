@@ -470,28 +470,48 @@ function race<Actions extends IOArray>(
     >;
   }
 
-  // TODO ignore cancellations unless all fibers have been canceled.
+  const typecastedActions = actions as readonly IO<
+    UnionOfValues<Actions>,
+    UnionOfErrors<Actions>
+  >[];
 
-  return IO(
-    () =>
-      new Promise<IOResult<UnionOfValues<Actions>, UnionOfErrors<Actions>>>(
-        (resolve, reject) => {
-          for (let i = 0; i < actions.length; i++) {
-            (actions[i] as IO<UnionOfValues<Actions>, UnionOfErrors<Actions>>)
-              .runSafe()
-              .then(resolve, reject);
-          }
-        }
+  return (
+    IO.sequence(typecastedActions.map(Fiber.start))
+      // when any of the fibers succeed or raise, cancel all other fibers.
+      .through((fibers) =>
+        IO.parallel(
+          fibers.map((fiber) =>
+            fiber
+              .outcome()
+              .andThen((outcome) =>
+                outcome === IOResult.Canceled ? IO.void : cancelAll(fibers)
+              )
+          )
+        )
       )
-  )
-    .catch(
-      (unsoundlyThrownError): IO<never, never> => {
-        // The promise above never intentionally rejects, so an error
-        // here means an error was thrown outside of the IO system.
-        throw unsoundlyThrownError;
-      }
-    )
-    .andThen(IOResult.toIO);
+      .andThen(findFirstFinishedOutcome)
+      .andThen(IOResult.toIO)
+  );
+}
+
+function cancelAll(fibers: Fiber<unknown, unknown>[]): IO<void, never> {
+  return IO.sequence(fibers.map((fiber) => fiber.cancel())).as(undefined);
+}
+
+function findFirstFinishedOutcome<A, E>(
+  fibers: Fiber<A, E>[],
+  index = 0
+): IO<IOResult<A, E>, never> {
+  if (index >= fibers.length) {
+    return IO.cancel();
+  }
+  return fibers[index]
+    .outcome()
+    .andThen((outcome) =>
+      outcome === IOResult.Canceled
+        ? findFirstFinishedOutcome(fibers, index + 1)
+        : IO.wrap(outcome)
+    );
 }
 
 const TIME_UNIT_FACTORS = {
