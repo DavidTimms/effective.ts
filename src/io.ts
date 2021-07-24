@@ -388,63 +388,51 @@ function sequenceFrom<Actions extends IOArray>(
 function parallel<Actions extends IOArray>(
   actions: Actions
 ): IO<ValuesArray<Actions>, UnionOfErrors<Actions>> {
-  return IO(
-    () =>
-      new Promise<Array<IOResult<unknown, unknown>>>((resolve, reject) => {
-        if (actions.length === 0) {
-          resolve([]);
-        }
-
-        // As each action completes, it writes its result to the corresponding
-        // index in this array.
-        const safeResults = Array<IOResult<unknown, unknown>>(actions.length);
-        // This count is used to determine when all actions have completed.
-        let resolvedCount = 0;
-
-        for (let i = 0; i < actions.length; i++) {
-          actions[i].runSafe().then((safeResult) => {
-            safeResults[i] = safeResult;
-            resolvedCount += 1;
-            if (
-              safeResult.outcome === IOOutcome.Raised ||
-              safeResult.outcome === IOOutcome.Canceled ||
-              resolvedCount === actions.length
-            ) {
-              // Either all actions have completed successfully, or one of
-              // them has raised or canceled, so we resolve the promise.
-
-              // eventually it should cancel the outstanding actions here.
-              resolve(safeResults);
-            }
-          }, reject);
-        }
-      })
-  )
-    .catch(
-      (unsoundlyThrownError): IO<never, never> => {
-        // The promise above never intentionally rejects, so an error
-        // here means an error was thrown outside of the IO system.
-        throw unsoundlyThrownError;
-      }
+  // Starts each action on a separate fiber then creates another fiber
+  // for each action which waits for the outcome of the first, and
+  // cancels the other fibers if it raises or cancels.
+  return IO.sequence(actions.map(Fiber.start))
+    .andThen((fibers) =>
+      IO.sequence(
+        fibers.map((fiber) =>
+          Fiber.start(
+            fiber
+              .outcome()
+              .through((outcome) =>
+                outcome.outcome === IOOutcome.Succeeded
+                  ? IO.void
+                  : cancelAll(fibers)
+              )
+          )
+            .andThen((fiber) => fiber.outcome())
+            .andThen(IOResult.toIO)
+        )
+      )
     )
-    .andThen((safeResults) => {
-      const succeeded = [];
-      for (const safeResult of safeResults) {
-        if (safeResult !== undefined) {
-          switch (safeResult.outcome) {
-            case IOOutcome.Succeeded:
-              succeeded.push(safeResult.value);
-              break;
+    .andThen((outcomes) => {
+      const succeededResults: unknown[] = [];
 
-            case IOOutcome.Raised:
-              return IO.raise(safeResult.value as UnionOfErrors<Actions>);
+      for (const outcome of outcomes) {
+        switch (outcome.outcome) {
+          case IOOutcome.Succeeded:
+            succeededResults.push(outcome.value);
+            break;
 
-            case IOOutcome.Canceled:
-              return IO.cancel();
-          }
+          case IOOutcome.Raised:
+            return IO.raise(outcome.value as UnionOfErrors<Actions>);
+
+          case IOOutcome.Canceled:
+            continue;
         }
       }
-      return IO.wrap((succeeded as unknown) as ValuesArray<Actions>);
+
+      if (succeededResults.length === actions.length) {
+        return IO.wrap((succeededResults as unknown) as ValuesArray<Actions>);
+      } else {
+        // If we get here then all of the actions were cancelled, so
+        // we cancel the calling fiber.
+        return IO.cancel();
+      }
     });
 }
 

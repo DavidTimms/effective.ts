@@ -8,6 +8,7 @@
 - [x] sequence and parallel functions
 - [x] race function
 - [ ] finally method
+- [ ] catchAll method for unsoundly throw errors
 
 # Async, Concurrency & Fault Tolerance
 
@@ -26,7 +27,7 @@
 - [x] Fiber.start function
 - [x] Fiber.cancel method
 - [x] Fiber.outcome method
-- [ ] Rewrite `parallel` using fibers
+- [x] Rewrite `parallel` using fibers
 - [x] Rewrite `race` using fibers
 - [x] IO.cancel function for a fiber to self-cancel
 - [ ] `IO.onCancel` method for resource cleanup (do we need a full-blown bracket/resource construct?)

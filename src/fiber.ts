@@ -22,12 +22,16 @@ export class Fiber<A, E> {
   }
 
   outcome(): IO<IOResult<A, E>, never> {
-    return IO(() => this.promise).castError<never>();
+    return IO(() => this.promise).catch((unsoundlyThrownError) => {
+      throw unsoundlyThrownError;
+    });
   }
 
   cancel(): IO<void, never> {
     return IO(() => {
       if (this.cancelCurrentEffect) this.cancelCurrentEffect();
-    }).castError<never>();
+    }).catch((unsoundlyThrownError) => {
+      throw unsoundlyThrownError;
+    });
   }
 }
