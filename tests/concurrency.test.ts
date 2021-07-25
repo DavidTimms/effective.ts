@@ -101,6 +101,35 @@ describe("The IO.parallel function", () => {
     await expect(inParallel.run()).rejects.toEqual(Error("failed quickly"));
     expect(events).toEqual(["short sleep is over"]);
   });
+
+  it("cancels the calling fiber if any of the actions cancel themselves", async () => {
+    const events: Array<string> = [];
+
+    const succeedsSlowly = IO(() => events.push("starting action 1"))
+      .andThen(() => IO.wait(2, "seconds"))
+      .andThen(() => IO(() => events.push("completing action 1")));
+
+    const cancelsQuickly = IO(() => events.push("starting action 2"))
+      .andThen(() => IO.wait(10, "milliseconds"))
+      .andThen(() => IO.cancel());
+
+    const failsSlowly = IO(() => events.push("starting action 3"))
+      .andThen(() => IO.wait(3, "seconds"))
+      .andThen(() => IO.raise("error"));
+
+    const inParallel = IO.parallel([
+      succeedsSlowly,
+      cancelsQuickly,
+      failsSlowly,
+    ]);
+
+    await expect(inParallel.runSafe()).resolves.toEqual(IOResult.Canceled);
+    expect(events).toEqual([
+      "starting action 1",
+      "starting action 2",
+      "starting action 3",
+    ]);
+  });
 });
 
 describe("The IO.race function", () => {
