@@ -82,10 +82,6 @@ describe("The IO.parallel function", () => {
   });
 
   it("rejects as soon as the first effect fails, without waiting for the others", async () => {
-    // This test currently causes jest to print a warning because the
-    // timer in the slow action is not cancelled, causing the process
-    // to stay active after the test run has finished. This should be
-    // resolved once the system supports cancellation.
     const events: Array<string> = [];
 
     const failsSlowly = IO.wait(30, "seconds")
