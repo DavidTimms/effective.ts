@@ -126,6 +126,30 @@ describe("The IO.parallel function", () => {
       "starting action 3",
     ]);
   });
+
+  it.skip("cancels the child fibers if the calling fiber is canceled", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.parallel([
+        IO(() => events.push("parallel IO 1 completed")).delay(
+          15,
+          "milliseconds"
+        ),
+        IO(() => events.push("parallel IO 2 completed")).delay(
+          10,
+          "milliseconds"
+        ),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel())
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
+  });
 });
 
 describe("The IO.race function", () => {
