@@ -442,8 +442,10 @@ function parallel<Actions extends IOArray>(
                   : cancelAll(fibers)
               )
           )
-            .andThen((fiber) => fiber.outcome())
-            .andThen(IOResult.toIO)
+        )
+      ).andThen((cancellationFibers) =>
+        IO.sequence(
+          cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
         )
       )
     )

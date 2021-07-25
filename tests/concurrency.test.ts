@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO, { Fiber, IOResult } from "../src/io";
+import IO, { Fiber, IOResult, TimeoutError } from "../src/io";
 import { successfulIo } from "./arbitraries";
 
 describe("The IO.sequence function", () => {
@@ -94,7 +94,9 @@ describe("The IO.parallel function", () => {
 
     const inParallel = IO.parallel([failsSlowly, failsQuickly]);
 
-    await expect(inParallel.run()).rejects.toEqual(Error("failed quickly"));
+    expect(await inParallel.runSafe()).toEqual(
+      IOResult.Raised(Error("failed quickly"))
+    );
     expect(events).toEqual(["short sleep is over"]);
   });
 
@@ -249,12 +251,9 @@ describe("The repeatForever method", () => {
       .andThen(() => IO.wait(100, "milliseconds"))
       .repeatForever();
 
-    const withTimeout = IO.parallel([
-      infinite,
-      IO.wait(350, "milliseconds").andThen(() => IO.raise("time's up")),
-    ]);
+    const withTimeout = infinite.timeout(350, "milliseconds");
 
-    await expect(withTimeout.run()).rejects.toEqual("time's up");
+    await expect(withTimeout.run()).rejects.toEqual(expect.any(TimeoutError));
     expect(performedCount).toBe(4);
   });
 });
