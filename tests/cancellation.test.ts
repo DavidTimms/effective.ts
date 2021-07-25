@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { CancellationError } from "../src/errors";
 import IO, { Fiber, IOOutcome, IOResult } from "../src/io";
+import * as arbitraries from "./arbitraries";
 
 describe("The IO.cancel function", () => {
   it("gives an IO which results in the 'canceled' outcome", async () => {
@@ -94,5 +95,50 @@ describe("The IO.cancelable function", () => {
     const outcome = await io.run();
 
     expect(outcome).toEqual(IOResult.Raised("error"));
+  });
+});
+
+describe("The IO.onCancel method", () => {
+  it("makes no difference to the outcome of the action if it succeeds", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.io, async (io) => {
+        const withOnCancel = io.onCancel(IO.void);
+        expect(await withOnCancel.runSafe()).toEqual(await io.runSafe());
+      })
+    ));
+
+  it("runs the cancellation handler if the action is cancelled", async () => {
+    let handlerRan = false;
+
+    const io = IO.cancel().onCancel(IO(() => (handlerRan = true)));
+
+    await io.runSafe();
+
+    expect(handlerRan).toBe(true);
+  });
+
+  it("does not run the cancellation handler if the action succeeds", async () => {
+    let handlerRan = false;
+
+    const io = IO.wrap(123).onCancel(IO(() => (handlerRan = true)));
+
+    await io.runSafe();
+
+    expect(handlerRan).toBe(false);
+  });
+
+  it("does not run the cancellation handler if the action raises an error", async () => {
+    let handlerRan = false;
+
+    const io = IO.raise("an error").onCancel(IO(() => (handlerRan = true)));
+
+    await io.runSafe();
+
+    expect(handlerRan).toBe(false);
+  });
+
+  it("changes the outcome to raise the error if the cancellation handler raises", async () => {
+    const io = IO.cancel().onCancel(IO.raise("an error"));
+    expect(await io.runSafe()).toEqual(IOResult.Raised("an error"));
   });
 });

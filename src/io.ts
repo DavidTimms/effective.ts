@@ -10,7 +10,8 @@ export type IO<A, E = unknown> =
   | AndThen<A, E, any, E>
   | Raise<A, E>
   | Catch<A, E, any, any, any>
-  | Cancel<A, E>;
+  | Cancel<A, E>
+  | OnCancel<A, E, any, any>;
 
 export enum IOOutcome {
   Succeeded,
@@ -119,6 +120,13 @@ abstract class IOBase<A, E = unknown> {
     return this.andThen((a) => next(a).as(a));
   }
 
+  onCancel<E2>(
+    this: IO<A, E>,
+    cancellationHandler: IO<unknown, E2>
+  ): IO<A, E | E2> {
+    return new OnCancel(this, cancellationHandler);
+  }
+
   as<B>(this: IO<A, E>, value: B): IO<B, E> {
     const wrappedValue = IO.wrap(value);
     return this.andThen(() => wrappedValue);
@@ -141,10 +149,14 @@ abstract class IOBase<A, E = unknown> {
     time: number,
     units: TimeUnits
   ): IO<A, E | TimeoutError> {
-    return IO.race([
-      this,
-      IO.wait(time, units).andThen(() => IO.raise(new TimeoutError())),
-    ]);
+    const raiseTimeout = IO.raise(new TimeoutError()).delay(time, units);
+
+    return Fiber.start(raiseTimeout).andThen((timeoutFiber) =>
+      IO.race([
+        this.onCancel(timeoutFiber.cancel()),
+        timeoutFiber.outcome().andThen(IOResult.toIO),
+      ])
+    );
   }
 
   /**
@@ -210,11 +222,13 @@ class Defer<A, E> extends IOBase<A, E> {
     const effect = this.effect;
 
     return new Promise(async (resolve) => {
+      const previousCancelCurrentEffect = fiber["cancelCurrentEffect"];
       try {
         const { promise, cancel } = effect();
         fiber["cancelCurrentEffect"] = () => {
           try {
             if (cancel) cancel();
+            previousCancelCurrentEffect();
           } catch (e) {
             // If the cancel function throws, the IO outcome is "raised"
             // instead of 'canceled'. This stops cancellation errors from
@@ -224,10 +238,10 @@ class Defer<A, E> extends IOBase<A, E> {
           resolve(IOResult.Canceled);
         };
         const value = await promise;
-        fiber["cancelCurrentEffect"] = null;
+        fiber["cancelCurrentEffect"] = previousCancelCurrentEffect;
         resolve(IOResult.Succeeded(value));
       } catch (e: unknown) {
-        fiber["cancelCurrentEffect"] = null;
+        fiber["cancelCurrentEffect"] = previousCancelCurrentEffect;
         resolve(IOResult.Raised(e as E));
       }
     });
@@ -297,6 +311,30 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
 class Cancel<A, E> extends IOBase<A, E> {
   protected async executeOn(): Promise<IOResult<A, E>> {
     return IOResult.Canceled;
+  }
+}
+
+class OnCancel<A, E, ParentE extends E, HandlerE extends E> extends IOBase<
+  A,
+  E
+> {
+  constructor(
+    readonly parent: IO<A, ParentE>,
+    private readonly cancellationHandler: IO<unknown, HandlerE>
+  ) {
+    super();
+  }
+
+  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+    const parentOutcome = await fiber._execute(this.parent);
+    if (parentOutcome.outcome === IOOutcome.Canceled) {
+      const handlerOutcome = await fiber._execute(this.cancellationHandler);
+
+      if (handlerOutcome.outcome === IOOutcome.Raised) {
+        return handlerOutcome;
+      }
+    }
+    return parentOutcome;
   }
 }
 
