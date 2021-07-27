@@ -31,6 +31,7 @@
 - [x] Rewrite `race` using fibers
 - [x] IO.cancel function for a fiber to self-cancel
 - [x] `IO.onCancel` method for resource cleanup (do we need a full-blown bracket/resource construct?)
+- [ ] Add a way to create atomic uncancelable sections to fix immediate cancellation race condition
 
 # Performance & Internals
 

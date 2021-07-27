@@ -443,11 +443,13 @@ function parallel<Actions extends IOArray>(
               )
           )
         )
-      ).andThen((cancellationFibers) =>
-        IO.sequence(
-          cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
-        )
       )
+        .andThen((cancellationFibers) =>
+          IO.sequence(
+            cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
+          )
+        )
+        .onCancel(cancelAll(fibers))
     )
     .andThen((outcomes) => {
       const succeededResults: unknown[] = [];
@@ -515,7 +517,7 @@ function race<Actions extends IOArray>(
                 outcome === IOResult.Canceled ? IO.void : cancelAll(fibers)
               )
           )
-        )
+        ).onCancel(cancelAll(fibers))
       )
       .andThen(findFirstFinishedOutcome)
       .andThen(IOResult.toIO)
@@ -523,7 +525,11 @@ function race<Actions extends IOArray>(
 }
 
 function cancelAll(fibers: Fiber<unknown, unknown>[]): IO<void, never> {
-  return IO.sequence(fibers.map((fiber) => fiber.cancel())).as(undefined);
+  if (fibers.length === 0) {
+    return IO.void;
+  } else {
+    return fibers[0].cancel().andThen(() => cancelAll(fibers.slice(1)));
+  }
 }
 
 function findFirstFinishedOutcome<A, E>(

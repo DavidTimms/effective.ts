@@ -129,7 +129,36 @@ describe("The IO.parallel function", () => {
     ]);
   });
 
-  it.skip("cancels the child fibers if the calling fiber is canceled", async () => {
+  it("cancels the child fibers if the calling fiber is canceled", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.parallel([
+        IO(() => events.push("parallel IO 1 completed")).delay(
+          50,
+          "milliseconds"
+        ),
+        IO(() => events.push("parallel IO 2 completed")).delay(
+          100,
+          "milliseconds"
+        ),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel().delay(10, "milliseconds"))
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
+  });
+
+  // This test currently fails because there is a race condition. There is
+  // a microscopic gap between starting the fibers and setting up the
+  // "onCancel" handler. If the calling fiber is cancelled in this gap, the
+  // fibers will not be canceled. I think the way to fix this is to introduce
+  // an "uncancelable" mechanism.
+  it.skip("cancels the child fibers if the calling fiber is canceled immediately", async () => {
     let events: string[] = [];
 
     const io = Fiber.start(
@@ -210,15 +239,26 @@ describe("The IO.race function", () => {
     expect(outcome).toEqual(IOResult.Succeeded("result"));
   });
 
-  /**
-   * TODO what is the best way to make this test pass?
-   *  - A) Implement a special case for IO.race and IO.parallel using Fiber.onCancel.
-   *  - B) Have cancellation of a fiber automatically propagate to all fibers it has
-   *       started.
-   *  - C) Have cancellation of a fiber propagate to any fiber which it is currently
-   *       awaiting the outcome of.
-   */
-  it.skip("cancels the child fibers if the calling fiber is canceled", async () => {
+  it("cancels the child fibers if the calling fiber is canceled", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.race([
+        IO(() => events.push("raced IO 1 completed")).delay(50, "milliseconds"),
+        IO(() => events.push("raced IO 2 completed")).delay(85, "milliseconds"),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel().delay(10, "milliseconds"))
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
+  });
+
+  // See equivalent test for description of the bug.
+  it.skip("cancels the child fibers if the calling fiber is canceled immediately", async () => {
     let events: string[] = [];
 
     const io = Fiber.start(

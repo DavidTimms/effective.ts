@@ -2,7 +2,7 @@ import { IO, IOResult } from "./io";
 
 const TRACE_FIBERS = false;
 
-export class Fiber<A, E> {
+export class Fiber<A = unknown, E = unknown> {
   // Assign each fiber a unique ID for debugging.
   private static nextId = 0;
   id = Fiber.nextId++;
