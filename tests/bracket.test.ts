@@ -1,0 +1,75 @@
+import fc from "fast-check";
+import IO from "../src/io";
+import * as arbitraries from "./arbitraries";
+
+describe("The IO.bracket function", () => {
+  it("Propagates any errors raised by the open function", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.unsuccessfulIo, async (willRaise) => {
+        const bracketed = IO.bracket(willRaise, () => IO.void)(() => IO.void);
+        expect(await bracketed.runSafe()).toEqual(await willRaise.runSafe());
+      })
+    ));
+
+  it("Propagates any errors raised by the use function", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.unsuccessfulIo, async (willRaise) => {
+        const bracketed = IO.bracket(
+          IO.wrap(null),
+          () => IO.void
+        )(() => willRaise);
+        expect(await bracketed.runSafe()).toEqual(await willRaise.runSafe());
+      })
+    ));
+
+  it("Propagates any errors raised by the close function", () =>
+    fc.assert(
+      fc.asyncProperty(
+        arbitraries.io,
+        arbitraries.unsuccessfulIo,
+        async (mightRaise, willRaise) => {
+          // If the `use` function raises, it still calls the `close` function.
+          // If `close` also raises, the error from `close` takes priority.
+          const bracketed = IO.bracket(
+            IO.wrap(null),
+            () => willRaise
+          )(() => mightRaise);
+          expect(await bracketed.runSafe()).toEqual(await willRaise.runSafe());
+        }
+      )
+    ));
+
+  it("Will always call the close function if the open function succeeds", () =>
+    fc.assert(
+      fc.asyncProperty(
+        fc.anything(),
+        arbitraries.io,
+        async (a, ioWithAnyOutcome) => {
+          const close = jest.fn(() => IO.void);
+
+          const bracketed = IO.bracket(
+            IO.wrap(a),
+            close
+          )(() => ioWithAnyOutcome);
+
+          await bracketed.runSafe();
+
+          expect(close).toHaveBeenCalledWith(a);
+        }
+      )
+    ));
+
+  it("Will always give the same outcome as the use function if open and close succeed", () =>
+    fc.assert(
+      fc.asyncProperty(arbitraries.io, async (ioWithAnyOutcome) => {
+        const bracketed = IO.bracket(
+          IO.void,
+          () => IO.void
+        )(() => ioWithAnyOutcome);
+
+        expect(await bracketed.runSafe()).toEqual(
+          await ioWithAnyOutcome.runSafe()
+        );
+      })
+    ));
+});

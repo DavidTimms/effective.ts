@@ -576,6 +576,33 @@ function wait(time: number, units: TimeUnits): IO<void, never> {
   }) as IO<void, never>;
 }
 
+function bracket<A, EOpen, EClose>(
+  open: IO<A, EOpen>,
+  close: (a: A) => IO<unknown, EClose>
+): <B, EUse>(use: (a: A) => IO<B, EUse>) => IO<B, EOpen | EClose | EUse> {
+  return <B, EUse>(use: (a: A) => IO<B, EUse>) =>
+    IO(async () => {
+      const openOutcome = await open.runSafe();
+      if (openOutcome.outcome === IOOutcome.Succeeded) {
+        const a = openOutcome.value;
+        const useOutcome = await use(a).runSafe();
+        const closeOutcome = await close(a).runSafe();
+
+        if (closeOutcome.outcome === IOOutcome.Raised) {
+          return closeOutcome;
+        } else {
+          return useOutcome;
+        }
+      } else {
+        return openOutcome;
+      }
+    })
+      .castError<never>()
+      .andThen((outcome: IOResult<B, EOpen | EClose | EUse>) =>
+        IOResult.toIO(outcome)
+      );
+}
+
 IO.cancelable = cancelable;
 IO.wrap = wrap;
 IO.raise = raise;
@@ -586,6 +613,7 @@ IO.sequence = sequence;
 IO.parallel = parallel;
 IO.race = race;
 IO.wait = wait;
+IO.bracket = bracket;
 
 // This alias for setTimeout is used instead of calling the
 // global directly, so it can be replaced with intercepting
