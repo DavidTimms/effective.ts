@@ -576,32 +576,38 @@ function wait(time: number, units: TimeUnits): IO<void, never> {
   }) as IO<void, never>;
 }
 
-function bracket<A, EOpen, EClose>(
+/**
+ * Creates a wrapper function which will use an `open` action to
+ * acquire a resource and `close` action to release it. If the
+ * `open` action succeeds, then the `close` function is guaranteed
+ * to be called. This can be used where you might use a `try... finally`
+ * block in imperative code, when a clean up action must always be
+ * taken.
+ */
+const bracket = <A, EOpen, EClose>(
   open: IO<A, EOpen>,
   close: (a: A) => IO<unknown, EClose>
-): <B, EUse>(use: (a: A) => IO<B, EUse>) => IO<B, EOpen | EClose | EUse> {
-  return <B, EUse>(use: (a: A) => IO<B, EUse>) =>
-    IO(async () => {
-      const openOutcome = await open.runSafe();
-      if (openOutcome.outcome === IOOutcome.Succeeded) {
-        const a = openOutcome.value;
-        const useOutcome = await use(a).runSafe();
-        const closeOutcome = await close(a).runSafe();
+) => <B, EUse>(use: (a: A) => IO<B, EUse>) =>
+  IO(async () => {
+    const openOutcome = await open.runSafe();
+    if (openOutcome.outcome === IOOutcome.Succeeded) {
+      const a = openOutcome.value;
+      const useOutcome = await use(a).runSafe();
+      const closeOutcome = await close(a).runSafe();
 
-        if (closeOutcome.outcome === IOOutcome.Raised) {
-          return closeOutcome;
-        } else {
-          return useOutcome;
-        }
+      if (closeOutcome.outcome === IOOutcome.Raised) {
+        return closeOutcome;
       } else {
-        return openOutcome;
+        return useOutcome;
       }
-    })
-      .castError<never>()
-      .andThen((outcome: IOResult<B, EOpen | EClose | EUse>) =>
-        IOResult.toIO(outcome)
-      );
-}
+    } else {
+      return openOutcome;
+    }
+  })
+    .castError<never>()
+    .andThen((outcome: IOResult<B, EOpen | EClose | EUse>) =>
+      IOResult.toIO(outcome)
+    );
 
 IO.cancelable = cancelable;
 IO.wrap = wrap;
