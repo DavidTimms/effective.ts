@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO from "../src/io";
+import IO, { Fiber } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The IO.bracket function", () => {
@@ -72,4 +72,17 @@ describe("The IO.bracket function", () => {
         );
       })
     ));
+
+  it("Will call the close function even if the fiber is immediately canceled", async () => {
+    const open = IO.void;
+    const close = jest.fn(() => IO.void);
+    const use = () => IO.void;
+    const io = Fiber.start(IO.bracket(open, close)(use)).andThen((fiber) =>
+      fiber.cancel()
+    );
+
+    await io.runSafe();
+
+    expect(close).toHaveBeenCalled();
+  });
 });
