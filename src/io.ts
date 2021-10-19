@@ -11,7 +11,8 @@ export type IO<A, E = unknown> =
   | Raise<A, E>
   | Catch<A, E, any, any, any>
   | Cancel<A, E>
-  | OnCancel<A, E, any, any>;
+  | OnCancel<A, E, any, any>
+  | Bracket<A, E, any, any, any, any>;
 
 export enum IOOutcome {
   Succeeded,
@@ -338,6 +339,45 @@ class OnCancel<A, E, ParentE extends E, HandlerE extends E> extends IOBase<
   }
 }
 
+class Bracket<
+  A,
+  E,
+  Resource,
+  EOpen extends E,
+  EClose extends E,
+  EUse extends E
+> extends IOBase<A, E> {
+  constructor(
+    private readonly open: IO<Resource, EOpen>,
+    private readonly close: (a: Resource) => IO<unknown, EClose>,
+    private readonly use: (a: Resource) => IO<A, EUse>
+  ) {
+    super();
+  }
+
+  protected async executeOn(
+    fiber: Fiber
+  ): Promise<IOResult<A, EOpen | EClose | EUse>> {
+    const { open, close, use } = this;
+
+    const openOutcome = await fiber._execute(open);
+
+    if (openOutcome.outcome === IOOutcome.Succeeded) {
+      const a = openOutcome.value;
+      const useOutcome = await fiber._execute(use(a));
+      const closeOutcome = await fiber._execute(close(a));
+
+      if (closeOutcome.outcome === IOOutcome.Raised) {
+        return closeOutcome;
+      } else {
+        return useOutcome;
+      }
+    } else {
+      return openOutcome;
+    }
+  }
+}
+
 export function IO<A>(effect: () => Promise<A> | A): IO<A, unknown> {
   return new Defer(() => ({
     promise: Promise.resolve(effect()),
@@ -363,7 +403,7 @@ function raise<E>(error: E): IO<never, E> {
  * Cancels the execution of the current fiber.
  */
 function cancel(): IO<never, never> {
-  return new Cancel();
+  return new Cancel<never, never>();
 }
 
 // TODO rename this function?
@@ -584,16 +624,16 @@ function wait(time: number, units: TimeUnits): IO<void, never> {
  * block in imperative code, when a clean up action must always be
  * taken.
  */
-const bracket = <A, EOpen, EClose>(
-  open: IO<A, EOpen>,
-  close: (a: A) => IO<unknown, EClose>
-) => <B, EUse>(use: (a: A) => IO<B, EUse>) =>
+const bracket = <Resource, EOpen, EClose>(
+  open: IO<Resource, EOpen>,
+  close: (r: Resource) => IO<unknown, EClose>
+) => <A, EUse>(use: (r: Resource) => IO<A, EUse>) =>
   IO(async () => {
     const openOutcome = await open.runSafe();
     if (openOutcome.outcome === IOOutcome.Succeeded) {
-      const a = openOutcome.value;
-      const useOutcome = await use(a).runSafe();
-      const closeOutcome = await close(a).runSafe();
+      const resource = openOutcome.value;
+      const useOutcome = await use(resource).runSafe();
+      const closeOutcome = await close(resource).runSafe();
 
       if (closeOutcome.outcome === IOOutcome.Raised) {
         return closeOutcome;
@@ -605,7 +645,7 @@ const bracket = <A, EOpen, EClose>(
     }
   })
     .castError<never>()
-    .andThen((outcome: IOResult<B, EOpen | EClose | EUse>) =>
+    .andThen((outcome: IOResult<A, EOpen | EClose | EUse>) =>
       IOResult.toIO(outcome)
     );
 

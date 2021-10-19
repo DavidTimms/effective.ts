@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO, { Fiber } from "../src/io";
+import IO, { Fiber, IOResult } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The IO.bracket function", () => {
@@ -84,5 +84,47 @@ describe("The IO.bracket function", () => {
     await io.runSafe();
 
     expect(close).toHaveBeenCalled();
+  });
+
+  it("Will allow cancellation of the open action", async () => {
+    const open = IO.void.delay(30, "seconds");
+    const close = jest.fn(() => IO.void);
+    const use = jest.fn(() => IO.void);
+    const io = Fiber.start(IO.bracket(open, close)(use))
+      .through(() => IO.wait(200, "milliseconds"))
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.run();
+    expect(outcome).toEqual(IOResult.Canceled);
+    expect(use).not.toHaveBeenCalled();
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("Will allow cancellation of the use action", async () => {
+    const open = IO.void;
+    const close = jest.fn(() => IO.void);
+    const use = jest.fn(() => IO.void.delay(30, "seconds"));
+    const io = Fiber.start(IO.bracket(open, close)(use))
+      .through(() => IO.wait(200, "milliseconds"))
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.run();
+    expect(outcome).toEqual(IOResult.Canceled);
+    expect(close).not.toHaveBeenCalled();
+  });
+
+  it("Will allow cancellation of the close action", async () => {
+    const open = IO.void;
+    const close = jest.fn(() => IO.void.delay(30, "seconds"));
+    const use = jest.fn(() => IO.void);
+    const io = Fiber.start(IO.bracket(open, close)(use))
+      .through(() => IO.wait(200, "milliseconds"))
+      .through((fiber) => fiber.cancel())
+      .andThen((fiber) => fiber.outcome());
+
+    const outcome = await io.run();
+    expect(outcome).toEqual(IOResult.Canceled);
   });
 });
