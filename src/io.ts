@@ -367,7 +367,7 @@ class Bracket<
       const useOutcome = await fiber._execute(use(a));
       const closeOutcome = await fiber._execute(close(a));
 
-      if (closeOutcome.outcome === IOOutcome.Raised) {
+      if (closeOutcome.outcome !== IOOutcome.Succeeded) {
         return closeOutcome;
       } else {
         return useOutcome;
@@ -628,26 +628,7 @@ const bracket = <Resource, EOpen, EClose>(
   open: IO<Resource, EOpen>,
   close: (r: Resource) => IO<unknown, EClose>
 ) => <A, EUse>(use: (r: Resource) => IO<A, EUse>) =>
-  IO(async () => {
-    const openOutcome = await open.runSafe();
-    if (openOutcome.outcome === IOOutcome.Succeeded) {
-      const resource = openOutcome.value;
-      const useOutcome = await use(resource).runSafe();
-      const closeOutcome = await close(resource).runSafe();
-
-      if (closeOutcome.outcome === IOOutcome.Raised) {
-        return closeOutcome;
-      } else {
-        return useOutcome;
-      }
-    } else {
-      return openOutcome;
-    }
-  })
-    .castError<never>()
-    .andThen((outcome: IOResult<A, EOpen | EClose | EUse>) =>
-      IOResult.toIO(outcome)
-    );
+  new Bracket(open, close, use);
 
 IO.cancelable = cancelable;
 IO.wrap = wrap;
