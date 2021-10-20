@@ -156,9 +156,8 @@ describe("The IO.parallel function", () => {
   // This test currently fails because there is a race condition. There is
   // a microscopic gap between starting the fibers and setting up the
   // "onCancel" handler. If the calling fiber is cancelled in this gap, the
-  // fibers will not be canceled. I think the way to fix this is to introduce
-  // an "uncancelable" mechanism.
-  it.skip("cancels the child fibers if the calling fiber is canceled immediately", async () => {
+  // fibers will not be canceled.
+  it.only("cancels the child fibers if the calling fiber is canceled immediately", async () => {
     let events: string[] = [];
 
     const io = Fiber.start(

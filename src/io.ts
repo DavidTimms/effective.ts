@@ -469,53 +469,70 @@ function parallel<Actions extends IOArray>(
   // Starts each action on a separate fiber then creates another fiber
   // for each action which waits for the outcome of the first, and
   // cancels the other fibers if it raises or cancels.
-  return IO.sequence(actions.map(Fiber.start))
-    .andThen((fibers) =>
-      IO.sequence(
-        fibers.map((fiber) =>
-          Fiber.start(
-            fiber
-              .outcome()
-              .through((outcome) =>
-                outcome.outcome === IOOutcome.Succeeded
-                  ? IO.void
-                  : cancelAll(fibers)
-              )
-          )
+
+  function startNextActionFiber(
+    previousFibers: Fiber[],
+    index: number
+  ): IO<IOResult<unknown, unknown>[], never> {
+    if (index >= actions.length) {
+      return startEarlyCancellationFibers(previousFibers);
+    } else {
+      const withFiber = bracket(Fiber.start(actions[index]), (f) => f.cancel());
+
+      return withFiber((fiber) =>
+        startNextActionFiber([...previousFibers, fiber], index + 1)
+      );
+    }
+  }
+
+  function startEarlyCancellationFibers(
+    fibers: Fiber[]
+  ): IO<IOResult<unknown, unknown>[], never> {
+    return IO.sequence(
+      fibers.map((fiber) =>
+        Fiber.start(
+          fiber
+            .outcome()
+            .through((outcome) =>
+              outcome.outcome === IOOutcome.Succeeded
+                ? IO.void
+                : cancelAll(fibers)
+            )
         )
       )
-        .andThen((cancellationFibers) =>
-          IO.sequence(
-            cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
-          )
-        )
-        .onCancel(cancelAll(fibers))
     )
-    .andThen((outcomes) => {
-      const succeededResults: unknown[] = [];
+      .andThen((cancellationFibers) =>
+        IO.sequence(
+          cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
+        )
+      )
+      .onCancel(cancelAll(fibers));
+  }
+  return startNextActionFiber([], 0).andThen((outcomes) => {
+    const succeededResults: unknown[] = [];
 
-      for (const outcome of outcomes) {
-        switch (outcome.outcome) {
-          case IOOutcome.Succeeded:
-            succeededResults.push(outcome.value);
-            break;
+    for (const outcome of outcomes) {
+      switch (outcome.outcome) {
+        case IOOutcome.Succeeded:
+          succeededResults.push(outcome.value);
+          break;
 
-          case IOOutcome.Raised:
-            return IO.raise(outcome.value as UnionOfErrors<Actions>);
+        case IOOutcome.Raised:
+          return IO.raise(outcome.value as UnionOfErrors<Actions>);
 
-          case IOOutcome.Canceled:
-            continue;
-        }
+        case IOOutcome.Canceled:
+          continue;
       }
+    }
 
-      if (succeededResults.length === actions.length) {
-        return IO.wrap((succeededResults as unknown) as ValuesArray<Actions>);
-      } else {
-        // If we get here then all of the actions were cancelled, so
-        // we cancel the calling fiber.
-        return IO.cancel();
-      }
-    });
+    if (succeededResults.length === actions.length) {
+      return IO.wrap((succeededResults as unknown) as ValuesArray<Actions>);
+    } else {
+      // If we get here then all of the actions were cancelled, so
+      // we cancel the calling fiber.
+      return IO.cancel();
+    }
+  });
 }
 
 /**
@@ -627,8 +644,9 @@ function wait(time: number, units: TimeUnits): IO<void, never> {
 const bracket = <Resource, EOpen, EClose>(
   open: IO<Resource, EOpen>,
   close: (r: Resource) => IO<unknown, EClose>
-) => <A, EUse>(use: (r: Resource) => IO<A, EUse>) =>
-  new Bracket(open, close, use);
+) => <A, EUse>(
+  use: (r: Resource) => IO<A, EUse>
+): IO<A, EOpen | EClose | EUse> => new Bracket(open, close, use);
 
 IO.cancelable = cancelable;
 IO.wrap = wrap;
