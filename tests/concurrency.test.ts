@@ -252,8 +252,7 @@ describe("The IO.race function", () => {
     expect(events).toEqual(["calling fiber canceled"]);
   });
 
-  // See equivalent test for description of the bug.
-  it.skip("cancels the child fibers if the calling fiber is canceled immediately", async () => {
+  it("cancels the child fibers if the calling fiber is canceled immediately", async () => {
     let events: string[] = [];
 
     const io = Fiber.start(

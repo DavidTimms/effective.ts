@@ -595,28 +595,60 @@ function race<Actions extends IOArray>(
     >;
   }
 
-  const typecastedActions = actions as readonly IO<
+  const typecastActions = actions as readonly IO<
     UnionOfValues<Actions>,
     UnionOfErrors<Actions>
   >[];
 
-  return (
-    IO.sequence(typecastedActions.map(Fiber.start))
-      // when any of the fibers succeed or raise, cancel all other fibers.
-      .through((fibers) =>
-        IO.parallel(
-          fibers.map((fiber) =>
-            fiber
-              .outcome()
-              .andThen((outcome) =>
-                outcome === IOResult.Canceled ? IO.void : cancelAll(fibers)
-              )
+  // Recursively starts each action on a separate fiber. The ref is used
+  // to ensure that there can never be an orphaned fiber which is not
+  // left running when the main parent fiber is canceled.
+  function startNextActionFiber(
+    previousFibers: Fiber<UnionOfValues<Actions>, UnionOfErrors<Actions>>[],
+    index: number
+  ): IO<Fiber<UnionOfValues<Actions>, UnionOfErrors<Actions>>[], never> {
+    if (index >= typecastActions.length) {
+      return startEarlyCancellationFibers(previousFibers).as(previousFibers);
+    } else {
+      return Ref.empty<Fiber>().andThen((fiberRef) =>
+        IO.uncancelable(
+          Fiber.start(typecastActions[index]).through(fiberRef.set)
+        )
+          .andThen((fiber) =>
+            startNextActionFiber([...previousFibers, fiber], index + 1)
           )
-        ).onCancel(cancelAll(fibers))
+          .onCancel(fiberRef.get.andThen((fiber) => fiber?.cancel() ?? IO.void))
+      );
+    }
+  }
+
+  // Creates a second fiber for each action which waits for the outcome
+  // of the first, and cancels the other fibers if it raises or succeeds.
+  function startEarlyCancellationFibers(
+    fibers: Fiber<UnionOfValues<Actions>, UnionOfErrors<Actions>>[]
+  ): IO<IOResult<UnionOfValues<Actions>, UnionOfErrors<Actions>>[], never> {
+    return IO.sequence(
+      fibers.map((fiber) =>
+        Fiber.start(
+          fiber
+            .outcome()
+            .through((outcome) =>
+              outcome === IOResult.Canceled ? IO.void : cancelAll(fibers)
+            )
+        )
       )
-      .andThen(findFirstFinishedOutcome)
-      .andThen(IOResult.toIO)
-  );
+    )
+      .andThen((cancellationFibers) =>
+        IO.sequence(
+          cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
+        )
+      )
+      .onCancel(cancelAll(fibers));
+  }
+
+  return startNextActionFiber([], 0)
+    .andThen(findFirstFinishedOutcome)
+    .andThen(IOResult.toIO);
 }
 
 function cancelAll(fibers: Fiber<unknown, unknown>[]): IO<void, never> {
