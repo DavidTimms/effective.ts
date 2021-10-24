@@ -498,10 +498,9 @@ function sequenceFrom<Actions extends IOArray>(
 function parallel<Actions extends IOArray>(
   actions: Actions
 ): IO<ValuesArray<Actions>, UnionOfErrors<Actions>> {
-  // Starts each action on a separate fiber then creates another fiber
-  // for each action which waits for the outcome of the first, and
-  // cancels the other fibers if it raises or cancels.
-
+  // Recursively starts each action on a separate fiber. The ref is used
+  // to ensure that there can never be an orphaned fiber which is not
+  // left running when the main parent fiber is canceled.
   function startNextActionFiber(
     previousFibers: Fiber[],
     index: number
@@ -519,6 +518,8 @@ function parallel<Actions extends IOArray>(
     }
   }
 
+  // Creates a second fiber for each action which waits for the outcome
+  // of the first, and cancels the other fibers if it raises or cancels.
   function startEarlyCancellationFibers(
     fibers: Fiber[]
   ): IO<IOResult<unknown, unknown>[], never> {
@@ -542,6 +543,7 @@ function parallel<Actions extends IOArray>(
       )
       .onCancel(cancelAll(fibers));
   }
+
   return startNextActionFiber([], 0).andThen((outcomes) => {
     const succeededResults: unknown[] = [];
 
@@ -551,6 +553,8 @@ function parallel<Actions extends IOArray>(
           succeededResults.push(outcome.value);
           break;
 
+        // If any of the actions raised an error, the overall action
+        // raises.
         case IOOutcome.Raised:
           return IO.raise(outcome.value as UnionOfErrors<Actions>);
 
