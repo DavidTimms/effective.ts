@@ -1,5 +1,6 @@
 import { CancellationError, TimeoutError } from "./errors";
 import { Fiber } from "./fiber";
+import { Ref } from "./ref";
 
 export { TimeoutError };
 export { Fiber };
@@ -12,6 +13,7 @@ export type IO<A, E = unknown> =
   | Catch<A, E, any, any, any>
   | Cancel<A, E>
   | OnCancel<A, E, any, any>
+  | Uncancelable<A, E>
   | Bracket<A, E, any, any, any, any>;
 
 export enum IOOutcome {
@@ -339,6 +341,32 @@ class OnCancel<A, E, ParentE extends E, HandlerE extends E> extends IOBase<
   }
 }
 
+class Uncancelable<A, E> extends IOBase<A, E> {
+  constructor(private readonly action: IO<A, E>) {
+    super();
+  }
+
+  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+    const previousCancelCurrentEffect = fiber["cancelCurrentEffect"];
+    let wasCanceled = false;
+
+    try {
+      // If this fiber is canceled, record that it was canceled, but
+      // don't resolve until the action is completed.
+      fiber["cancelCurrentEffect"] = () => {
+        wasCanceled = true;
+      };
+
+      // Run the action on a separate fiber.
+      const result = await this.action.runSafe();
+
+      return wasCanceled ? IOResult.Canceled : result;
+    } finally {
+      fiber["cancelCurrentEffect"] = previousCancelCurrentEffect;
+    }
+  }
+}
+
 class Bracket<
   A,
   E,
@@ -389,6 +417,10 @@ function cancelable<A>(
   cancelableEffect: () => { promise: Promise<A>; cancel: () => void }
 ): IO<A, unknown> {
   return new Defer(cancelableEffect);
+}
+
+function uncancelable<A, E>(action: IO<A, E>): IO<A, E> {
+  return new Uncancelable(action);
 }
 
 function wrap<A>(value: A): IO<A, never> {
@@ -477,10 +509,12 @@ function parallel<Actions extends IOArray>(
     if (index >= actions.length) {
       return startEarlyCancellationFibers(previousFibers);
     } else {
-      const withFiber = bracket(Fiber.start(actions[index]), (f) => f.cancel());
-
-      return withFiber((fiber) =>
-        startNextActionFiber([...previousFibers, fiber], index + 1)
+      return Ref.empty<Fiber>().andThen((fiberRef) =>
+        IO.uncancelable(Fiber.start(actions[index]).through(fiberRef.set))
+          .andThen((fiber) =>
+            startNextActionFiber([...previousFibers, fiber], index + 1)
+          )
+          .onCancel(fiberRef.get.andThen((fiber) => fiber?.cancel() ?? IO.void))
       );
     }
   }
@@ -659,6 +693,7 @@ IO.parallel = parallel;
 IO.race = race;
 IO.wait = wait;
 IO.bracket = bracket;
+IO.uncancelable = uncancelable;
 
 // This alias for setTimeout is used instead of calling the
 // global directly, so it can be replaced with intercepting

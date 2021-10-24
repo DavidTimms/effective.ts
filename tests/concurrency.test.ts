@@ -153,11 +153,7 @@ describe("The IO.parallel function", () => {
     expect(events).toEqual(["calling fiber canceled"]);
   });
 
-  // This test currently fails because there is a race condition. There is
-  // a microscopic gap between starting the fibers and setting up the
-  // "onCancel" handler. If the calling fiber is cancelled in this gap, the
-  // fibers will not be canceled.
-  it.only("cancels the child fibers if the calling fiber is canceled immediately", async () => {
+  it("cancels the child fibers if the calling fiber is canceled immediately", async () => {
     let events: string[] = [];
 
     const io = Fiber.start(
