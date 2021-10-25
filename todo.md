@@ -31,8 +31,17 @@
 - [x] Rewrite `race` using fibers
 - [x] IO.cancel function for a fiber to self-cancel
 - [x] `IO.onCancel` method for resource cleanup
-- [ ] Add `IO.bracket` function for resource cleanup to fix immediate cancellation race condition
-- [ ] Add a way to create atomic uncancelable sections
+- [x] Add `IO.bracket` function for resource cleanup
+- [x] Add a way to create uncancelable sections
+
+# Data Structures
+
+- [x] Ref
+- [ ] Tests for Ref
+- [ ] Deferred?
+- [ ] Queue?
+- [ ] Batcher?
+- [ ] FiberPool - for limiting concurrency. Build on top of Queue?
 
 # Performance & Internals
 
