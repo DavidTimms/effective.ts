@@ -142,3 +142,25 @@ describe("The IO.onCancel method", () => {
     expect(await io.runSafe()).toEqual(IOResult.Raised("an error"));
   });
 });
+
+describe("The IO.uncancelable function", () => {
+  it("allows an action to complete even if it the fiber is canceled", async () => {
+    let actionCompleted = false;
+
+    const io = Fiber.start(
+      IO.uncancelable(
+        IO(() => (actionCompleted = true)).delay(30, "milliseconds")
+      )
+    ).andThen((fiber) =>
+      fiber
+        .cancel()
+        .delay(10, "milliseconds")
+        .andThen(() => fiber.outcome())
+    );
+
+    const outcome = await io.run();
+
+    expect(actionCompleted).toBe(true);
+    expect(outcome).toEqual(IOResult.Canceled);
+  });
+});
