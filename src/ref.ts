@@ -24,8 +24,21 @@ export class Ref<A> {
     return Ref.create<A | null>(null);
   }
 
+  static get<A>(ref: Ref<A>): IO<A, never> {
+    return ref.get;
+  }
+
+  static set<A>(newValue: A): (ref: Ref<A>) => IO<void, never> {
+    return (ref) => ref.set(newValue);
+  }
+
+  static modify<A>(
+    modifier: (currentValue: A) => A
+  ): (ref: Ref<A>) => IO<A, never> {
+    return (ref) => ref.modify(modifier);
+  }
+
   get: IO<A, never>;
   set: (newValue: A) => IO<void, never>;
-
   modify: (modifier: (currentValue: A) => A) => IO<A, never>;
 }
