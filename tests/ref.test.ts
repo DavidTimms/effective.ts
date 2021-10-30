@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import IO from "../src/io";
 import { Ref } from "../src/ref";
+import { range } from "./utils";
 
 describe("the Ref class", () => {
   it("can be created with an initial value", () =>
@@ -77,4 +78,28 @@ describe("the Ref class", () => {
         expect(result[1]).toBe(initialValue + 1);
       })
     ));
+
+  it("performs the modify operation without context switching to other fibers, avoiding race conditions", async () => {
+    // This test starts a thousand parallel fibers which each
+    // wait a random number of milliseconds (between 0 and 10)
+    // before incrementing the counter. This simulates many
+    // concurrent fibers modifying the same ref. If any of the
+    // updates lost, the eventual total would incorrectly be
+    // less than 1000.
+
+    const program = Ref.create(0)
+      .through((ref) =>
+        IO.parallel(
+          range(1000).map(() =>
+            IO(() => Math.floor(Math.random() * 10)).andThen((jitterMs) =>
+              ref.modify((count) => count + 1).delay(jitterMs, "milliseconds")
+            )
+          )
+        )
+      )
+      .andThen(Ref.get);
+
+    const result = await program.run();
+    expect(result).toBe(1000);
+  });
 });
