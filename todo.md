@@ -37,7 +37,7 @@
 # Data Structures
 
 - [x] Ref
-- [ ] Tests for Ref
+- [x] Tests for Ref
 - [ ] Deferred?
 - [ ] Queue?
 - [ ] Batcher?

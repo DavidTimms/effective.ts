@@ -84,8 +84,8 @@ describe("the Ref class", () => {
     // wait a random number of milliseconds (between 0 and 10)
     // before incrementing the counter. This simulates many
     // concurrent fibers modifying the same ref. If any of the
-    // updates lost, the eventual total would incorrectly be
-    // less than 1000.
+    // updates were lost, the eventual total would incorrectly
+    // be less than 1000.
 
     const program = Ref.create(0)
       .through((ref) =>
