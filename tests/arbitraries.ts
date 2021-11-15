@@ -29,7 +29,8 @@ export const unsuccessfulIo: Arbitrary<IO<unknown>> = fc
 
 export const io: Arbitrary<IO<unknown>> = fc.oneof(
   successfulIo,
-  unsuccessfulIo
+  unsuccessfulIo,
+  fc.constant(IO.cancel())
 );
 
 export const unaryFunction: Arbitrary<
