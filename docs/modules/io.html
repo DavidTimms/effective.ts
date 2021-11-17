@@ -72,11 +72,15 @@
 						<section class="tsd-index-section ">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#bracket" class="tsd-kind-icon">bracket</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#cancel" class="tsd-kind-icon">cancel</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#cancelable" class="tsd-kind-icon">cancelable</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#lift" class="tsd-kind-icon">lift</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#parallel" class="tsd-kind-icon">parallel</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#race" class="tsd-kind-icon">race</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#raise" class="tsd-kind-icon">raise</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#sequence" class="tsd-kind-icon">sequence</a></li>
+								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#uncancelable" class="tsd-kind-icon">uncancelable</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#void" class="tsd-kind-icon">void</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#wait" class="tsd-kind-icon">wait</a></li>
 								<li class="tsd-kind-variable tsd-parent-kind-namespace"><a href="io.html#wrap" class="tsd-kind-icon">wrap</a></li>
@@ -87,6 +91,215 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
+					<a name="bracket" class="tsd-anchor"></a>
+					<h3>bracket</h3>
+					<div class="tsd-signature tsd-kind-icon">bracket<span class="tsd-signature-symbol">:</span> &lt;Resource, EOpen, EClose&gt;<span class="tsd-signature-symbol">(</span>open<span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol">&gt;</span>, close<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span>&lt;A, EUse&gt;<span class="tsd-signature-symbol">(</span>use<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-namespace tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;Resource, EOpen, EClose&gt;<span class="tsd-signature-symbol">(</span>open<span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol">&gt;</span>, close<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span>&lt;A, EUse&gt;<span class="tsd-signature-symbol">(</span>use<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<div class="tsd-comment tsd-typography">
+											<div class="lead">
+												<p>Creates a wrapper function which will use an <code>open</code> action to
+													acquire a resource and <code>close</code> action to release it. If the
+													<code>open</code> action succeeds, then the <code>close</code> function is guaranteed
+													to be called. This can be used where you might use a <code>try... finally</code>
+													block in imperative code, when a clean up action must always be
+												taken.</p>
+											</div>
+										</div>
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>Resource</h4>
+											</li>
+											<li>
+												<h4>EOpen</h4>
+											</li>
+											<li>
+												<h4>EClose</h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>open: <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+											<li>
+												<h5>close: <span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol">&gt;</span></h5>
+												<ul class="tsd-parameters">
+													<li class="tsd-parameter-signature">
+														<ul class="tsd-signatures tsd-kind-type-literal">
+															<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol">&gt;</span></li>
+														</ul>
+														<ul class="tsd-descriptions">
+															<li class="tsd-description">
+																<h4 class="tsd-parameters-title">Parameters</h4>
+																<ul class="tsd-parameters">
+																	<li>
+																		<h5>r: <span class="tsd-signature-type">Resource</span></h5>
+																	</li>
+																</ul>
+																<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol">&gt;</span></h4>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns &lt;A, EUse&gt;<span class="tsd-signature-symbol">(</span>use<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></h4>
+										<ul class="tsd-parameters">
+											<li class="tsd-parameter-signature">
+												<ul class="tsd-signatures tsd-kind-type-literal tsd-has-type-parameter">
+													<li class="tsd-signature tsd-kind-icon">&lt;A, EUse&gt;<span class="tsd-signature-symbol">(</span>use<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></li>
+												</ul>
+												<ul class="tsd-descriptions">
+													<li class="tsd-description">
+														<h4 class="tsd-type-parameters-title">Type parameters</h4>
+														<ul class="tsd-type-parameters">
+															<li>
+																<h4>A</h4>
+															</li>
+															<li>
+																<h4>EUse</h4>
+															</li>
+														</ul>
+														<h4 class="tsd-parameters-title">Parameters</h4>
+														<ul class="tsd-parameters">
+															<li>
+																<h5>use: <span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></h5>
+																<ul class="tsd-parameters">
+																	<li class="tsd-parameter-signature">
+																		<ul class="tsd-signatures tsd-kind-type-literal">
+																			<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>r<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Resource</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></li>
+																		</ul>
+																		<ul class="tsd-descriptions">
+																			<li class="tsd-description">
+																				<h4 class="tsd-parameters-title">Parameters</h4>
+																				<ul class="tsd-parameters">
+																					<li>
+																						<h5>r: <span class="tsd-signature-type">Resource</span></h5>
+																					</li>
+																				</ul>
+																				<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></h4>
+																			</li>
+																		</ul>
+																	</li>
+																</ul>
+															</li>
+														</ul>
+														<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">EOpen</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EClose</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">EUse</span><span class="tsd-signature-symbol">&gt;</span></h4>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
+					<a name="cancel" class="tsd-anchor"></a>
+					<h3>cancel</h3>
+					<div class="tsd-signature tsd-kind-icon">cancel<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-namespace">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<div class="tsd-comment tsd-typography">
+											<div class="lead">
+												<p>Cancels the execution of the current fiber.</p>
+											</div>
+										</div>
+										<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
+					<a name="cancelable" class="tsd-anchor"></a>
+					<h3>cancelable</h3>
+					<div class="tsd-signature tsd-kind-icon">cancelable<span class="tsd-signature-symbol">:</span> &lt;A&gt;<span class="tsd-signature-symbol">(</span>cancelableEffect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-symbol">{ </span>cancel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>promise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-namespace tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;A&gt;<span class="tsd-signature-symbol">(</span>cancelableEffect<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-symbol">{ </span>cancel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>promise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>A</h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>cancelableEffect: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-symbol">{ </span>cancel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>promise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></h5>
+												<ul class="tsd-parameters">
+													<li class="tsd-parameter-signature">
+														<ul class="tsd-signatures tsd-kind-type-literal">
+															<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>cancel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>promise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></li>
+														</ul>
+														<ul class="tsd-descriptions">
+															<li class="tsd-description">
+																<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>cancel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">; </span>promise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></h4>
+																<ul class="tsd-parameters">
+																	<li class="tsd-parameter">
+																		<h5>cancel<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+																		<ul class="tsd-parameters">
+																			<li class="tsd-parameter-signature">
+																				<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-literal">
+																					<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+																				</ul>
+																				<ul class="tsd-descriptions">
+																					<li class="tsd-description">
+																						<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+																					</li>
+																				</ul>
+																			</li>
+																		</ul>
+																	</li>
+																	<li class="tsd-parameter">
+																		<h5>promise<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">&gt;</span></h5>
+																	</li>
+																</ul>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
 					<a name="lift" class="tsd-anchor"></a>
 					<h3>lift</h3>
@@ -318,6 +531,43 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
+					<a name="uncancelable" class="tsd-anchor"></a>
+					<h3>uncancelable</h3>
+					<div class="tsd-signature tsd-kind-icon">uncancelable<span class="tsd-signature-symbol">:</span> &lt;A, E&gt;<span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-namespace tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;A, E&gt;<span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>A</h4>
+											</li>
+											<li>
+												<h4>E</h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>action: <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-namespace">
 					<a name="void" class="tsd-anchor"></a>
 					<h3>void</h3>
 					<div class="tsd-signature tsd-kind-icon">void<span class="tsd-signature-symbol">:</span> <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></div>
@@ -405,6 +655,15 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
+						<a href="io.html#bracket" class="tsd-kind-icon">bracket</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
+						<a href="io.html#cancel" class="tsd-kind-icon">cancel</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
+						<a href="io.html#cancelable" class="tsd-kind-icon">cancelable</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
 						<a href="io.html#lift" class="tsd-kind-icon">lift</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
@@ -418,6 +677,9 @@
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
 						<a href="io.html#sequence" class="tsd-kind-icon">sequence</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
+						<a href="io.html#uncancelable" class="tsd-kind-icon">uncancelable</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-parent-kind-namespace">
 						<a href="io.html#void" class="tsd-kind-icon">void</a>
@@ -439,6 +701,15 @@
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
 			</ul>
 		</div>
 	</div>

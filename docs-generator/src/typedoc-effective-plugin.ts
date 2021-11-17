@@ -20,21 +20,21 @@ export function load(app: Application) {
       removeItem(group(IO, "Variables").children, _setTimeout);
     }
 
-    const IOBase = project.getChildByName("IOBase");
-    if (!(IOBase instanceof DeclarationReflection))
-      throw "Failed to find IOBase";
+    // const IOBase = project.getChildByName("IOBase");
+    // if (!(IOBase instanceof DeclarationReflection))
+    //   throw "Failed to find IOBase";
 
-    project.removeReflection(IOBase);
+    // project.removeReflection(IOBase);
 
-    const IOType = project
-      .getReflectionsByKind(ReflectionKind.TypeAlias)
-      .find((reflection) => reflection.name === "IO");
+    // const IOType = project
+    //   .getReflectionsByKind(ReflectionKind.TypeAlias)
+    //   .find((reflection) => reflection.name === "IO");
 
-    if (!(IOType instanceof DeclarationReflection))
-      throw "Failed to find IO type alias";
+    // if (!(IOType instanceof DeclarationReflection))
+    //   throw "Failed to find IO type alias";
 
-    // IOType.groups?.push(group(IOBase, "Methods"));
-    IOType.children?.push(...(IOBase.children ?? []));
+    // // IOType.groups?.push(group(IOBase, "Methods"));
+    // IOType.children?.push(...(IOBase.children ?? []));
   });
 }
 
