@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import { IOOutcome } from "../src/io";
+import { OutcomeKind } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The through method", () => {
@@ -9,18 +9,18 @@ describe("The through method", () => {
         arbitraries.io,
         arbitraries.successfulIo,
         async (firstIo, secondIo) => {
-          const firstIoResult = await firstIo.runSafe();
+          const firstIoOutcome = await firstIo.runSafe();
 
           const throughFunc = jest.fn(() => secondIo);
           const resultThroughAdditionalIo = await firstIo
             .through(throughFunc)
             .runSafe();
 
-          expect(resultThroughAdditionalIo).toEqual(firstIoResult);
+          expect(resultThroughAdditionalIo).toEqual(firstIoOutcome);
 
-          if (firstIoResult.outcome === IOOutcome.Succeeded) {
+          if (firstIoOutcome.kind === OutcomeKind.Succeeded) {
             expect(throughFunc).toHaveBeenCalledTimes(1);
-            expect(throughFunc).toHaveBeenCalledWith(firstIoResult.value);
+            expect(throughFunc).toHaveBeenCalledWith(firstIoOutcome.value);
           } else {
             expect(throughFunc).toHaveBeenCalledTimes(0);
           }

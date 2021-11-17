@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO from "../src/io";
+import IO, { Fiber, Outcome, TimeoutError } from "../src/io";
 import { successfulIo } from "./arbitraries";
 
 describe("The IO.sequence function", () => {
@@ -82,10 +82,6 @@ describe("The IO.parallel function", () => {
   });
 
   it("rejects as soon as the first effect fails, without waiting for the others", async () => {
-    // This test currently causes jest to print a warning because the
-    // timer in the slow action is not cancelled, causing the process
-    // to stay active after the test run has finished. This should be
-    // resolved once the system supports cancellation.
     const events: Array<string> = [];
 
     const failsSlowly = IO.wait(30, "seconds")
@@ -98,8 +94,87 @@ describe("The IO.parallel function", () => {
 
     const inParallel = IO.parallel([failsSlowly, failsQuickly]);
 
-    await expect(inParallel.run()).rejects.toEqual(Error("failed quickly"));
+    expect(await inParallel.runSafe()).toEqual(
+      Outcome.Raised(Error("failed quickly"))
+    );
     expect(events).toEqual(["short sleep is over"]);
+  });
+
+  it("cancels the calling fiber if any of the actions cancel themselves", async () => {
+    const events: Array<string> = [];
+
+    const succeedsSlowly = IO(() => events.push("starting action 1"))
+      .andThen(() => IO.wait(2, "seconds"))
+      .andThen(() => IO(() => events.push("completing action 1")));
+
+    const cancelsQuickly = IO(() => events.push("starting action 2"))
+      .andThen(() => IO.wait(10, "milliseconds"))
+      .andThen(() => IO.cancel());
+
+    const failsSlowly = IO(() => events.push("starting action 3"))
+      .andThen(() => IO.wait(3, "seconds"))
+      .andThen(() => IO.raise("error"));
+
+    const inParallel = IO.parallel([
+      succeedsSlowly,
+      cancelsQuickly,
+      failsSlowly,
+    ]);
+
+    await expect(inParallel.runSafe()).resolves.toEqual(Outcome.Canceled);
+    expect(events).toEqual([
+      "starting action 1",
+      "starting action 2",
+      "starting action 3",
+    ]);
+  });
+
+  it("cancels the child fibers if the calling fiber is canceled", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.parallel([
+        IO(() => events.push("parallel IO 1 completed")).delay(
+          50,
+          "milliseconds"
+        ),
+        IO(() => events.push("parallel IO 2 completed")).delay(
+          100,
+          "milliseconds"
+        ),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel().delay(10, "milliseconds"))
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
+  });
+
+  it("cancels the child fibers if the calling fiber is canceled immediately", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.parallel([
+        IO(() => events.push("parallel IO 1 completed")).delay(
+          15,
+          "milliseconds"
+        ),
+        IO(() => events.push("parallel IO 2 completed")).delay(
+          10,
+          "milliseconds"
+        ),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel())
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
   });
 });
 
@@ -128,9 +203,9 @@ describe("The IO.race function", () => {
 
   it("stops at the earliest error encountered", async () => {
     const failsSlowly = IO.raise("failed slowly").delay(100, "milliseconds");
-    const succeeeds = IO.wrap("succeeeded").delay(50, "milliseconds");
+    const succeeds = IO.wrap("succeeded").delay(50, "milliseconds");
     const failsQuickly = IO.raise("failed quickly").delay(10, "milliseconds");
-    const raced = IO.race([failsSlowly, succeeeds, failsQuickly]);
+    const raced = IO.race([failsSlowly, succeeds, failsQuickly]);
     await expect(raced.run()).rejects.toBe("failed quickly");
   });
 
@@ -142,6 +217,64 @@ describe("The IO.race function", () => {
       IO.raise(Error()),
     ]);
   });
+
+  it("cancels the calling fiber if all raced IOs cancel themselves", async () => {
+    const io = IO.race([IO.cancel(), IO.cancel().delay(5, "milliseconds")]);
+    const outcome = await io.runSafe();
+    expect(outcome).toEqual(Outcome.Canceled);
+  });
+
+  it("ignores IOs which cancel themselves as long as one finishes", async () => {
+    const io = IO.race([
+      IO.cancel(),
+      IO.wrap("result").delay(10, "milliseconds"),
+      IO.cancel().delay(5, "milliseconds"),
+    ]);
+    const outcome = await io.runSafe();
+    expect(outcome).toEqual(Outcome.Succeeded("result"));
+  });
+
+  it("cancels the child fibers if the calling fiber is canceled", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.race([
+        IO(() => events.push("raced IO 1 completed")).delay(50, "milliseconds"),
+        IO(() => events.push("raced IO 2 completed")).delay(85, "milliseconds"),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel().delay(10, "milliseconds"))
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
+  });
+
+  it("cancels the child fibers if the calling fiber is canceled immediately", async () => {
+    let events: string[] = [];
+
+    const io = Fiber.start(
+      IO.race([
+        IO(() => events.push("raced IO 1 completed")).delay(15, "milliseconds"),
+        IO(() => events.push("raced IO 2 completed")).delay(10, "milliseconds"),
+      ])
+    )
+      .andThen((fiber) => fiber.cancel())
+      .andThen(() => IO(() => events.push("calling fiber canceled")))
+      .andThen(() => IO.wait(20, "milliseconds"));
+
+    await io.runSafe();
+
+    expect(events).toEqual(["calling fiber canceled"]);
+  });
+
+  it("raises a runtime type error if called with an empty array", async () => {
+    const io = IO.race([]);
+    const outcome = await io.runSafe();
+    expect(outcome).toEqual(Outcome.Raised(expect.any(TypeError)));
+  });
 });
 
 describe("The repeatForever method", () => {
@@ -152,12 +285,9 @@ describe("The repeatForever method", () => {
       .andThen(() => IO.wait(100, "milliseconds"))
       .repeatForever();
 
-    const withTimeout = IO.parallel([
-      infinite,
-      IO.wait(350, "milliseconds").andThen(() => IO.raise("time's up")),
-    ]);
+    const withTimeout = infinite.timeout(350, "milliseconds");
 
-    await expect(withTimeout.run()).rejects.toEqual("time's up");
+    await expect(withTimeout.run()).rejects.toEqual(expect.any(TimeoutError));
     expect(performedCount).toBe(4);
   });
 });

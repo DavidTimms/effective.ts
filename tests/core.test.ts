@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO, { IOOutcome } from "../src/io";
+import IO, { OutcomeKind } from "../src/io";
 import { range } from "./utils";
 import * as arbitraries from "./arbitraries";
 
@@ -124,7 +124,7 @@ describe("The andThen method", () => {
     const raiseAndThen = IO.raise(Error("Kaboom!")).andThen(nextFunction);
 
     expect(await raiseAndThen.runSafe()).toEqual({
-      outcome: IOOutcome.Raised,
+      kind: OutcomeKind.Raised,
       value: Error("Kaboom!"),
     });
     expect(nextFunction).toHaveBeenCalledTimes(0);

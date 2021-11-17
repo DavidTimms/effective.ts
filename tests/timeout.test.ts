@@ -28,7 +28,7 @@ describe("The timeout method", () => {
         fc.integer({ min: 0, max: 8 }).map((x) => x * 5),
         fc.integer({ min: 0, max: 8 }).map((x) => x * 5),
         async (io, msToComplete, msToTimeout) => {
-          fc.pre(msToComplete <= msToTimeout);
+          fc.pre(msToComplete < msToTimeout);
           expect(
             await io
               .delay(msToComplete, "milliseconds")

@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "jest --forceExit",
+    "test": "jest --maxWorkers 2",
     "lint": "prettier --check 'src/**.ts' 'tests/**.ts'",
     "prepare": "npm run build",
     "generate-docs": "tsc --project docs-generator && typedoc --plugin ./docs-generator/dist/typedoc-effective-plugin.js src/io.ts",
