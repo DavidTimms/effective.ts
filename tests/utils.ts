@@ -1,4 +1,4 @@
-import IO, { IOResult } from "../src/io";
+import IO, { Outcome } from "../src/io";
 
 export function range(n: number): number[] {
   return Array(n)
@@ -17,7 +17,7 @@ type TimeoutTrace = Array<
 
 export async function runSafeWithTimeoutTrace<A, E>(
   io: IO<A, E>
-): Promise<[IOResult<A, E>, TimeoutTrace]> {
+): Promise<[Outcome<A, E>, TimeoutTrace]> {
   const trace: TimeoutTrace = [];
   const originalSetTimeout = IO._setTimeout;
   try {

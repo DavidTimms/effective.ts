@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { CancellationError } from "../src/errors";
-import IO, { Fiber, OutcomeKind, IOResult } from "../src/io";
+import IO, { Fiber, OutcomeKind, Outcome } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The IO.cancel function", () => {
@@ -94,7 +94,7 @@ describe("The IO.cancelable function", () => {
 
     const outcome = await io.run();
 
-    expect(outcome).toEqual(IOResult.Raised("error"));
+    expect(outcome).toEqual(Outcome.Raised("error"));
   });
 });
 
@@ -139,7 +139,7 @@ describe("The IO.onCancel method", () => {
 
   it("changes the outcome to raise the error if the cancellation handler raises", async () => {
     const io = IO.cancel().onCancel(IO.raise("an error"));
-    expect(await io.runSafe()).toEqual(IOResult.Raised("an error"));
+    expect(await io.runSafe()).toEqual(Outcome.Raised("an error"));
   });
 });
 
@@ -161,6 +161,6 @@ describe("The IO.uncancelable function", () => {
     const outcome = await io.run();
 
     expect(actionCompleted).toBe(true);
-    expect(outcome).toEqual(IOResult.Canceled);
+    expect(outcome).toEqual(Outcome.Canceled);
   });
 });

@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO, { Fiber, IOResult, TimeoutError } from "../src/io";
+import IO, { Fiber, Outcome, TimeoutError } from "../src/io";
 import { successfulIo } from "./arbitraries";
 
 describe("The IO.sequence function", () => {
@@ -95,7 +95,7 @@ describe("The IO.parallel function", () => {
     const inParallel = IO.parallel([failsSlowly, failsQuickly]);
 
     expect(await inParallel.runSafe()).toEqual(
-      IOResult.Raised(Error("failed quickly"))
+      Outcome.Raised(Error("failed quickly"))
     );
     expect(events).toEqual(["short sleep is over"]);
   });
@@ -121,7 +121,7 @@ describe("The IO.parallel function", () => {
       failsSlowly,
     ]);
 
-    await expect(inParallel.runSafe()).resolves.toEqual(IOResult.Canceled);
+    await expect(inParallel.runSafe()).resolves.toEqual(Outcome.Canceled);
     expect(events).toEqual([
       "starting action 1",
       "starting action 2",
@@ -221,7 +221,7 @@ describe("The IO.race function", () => {
   it("cancels the calling fiber if all raced IOs cancel themselves", async () => {
     const io = IO.race([IO.cancel(), IO.cancel().delay(5, "milliseconds")]);
     const outcome = await io.runSafe();
-    expect(outcome).toEqual(IOResult.Canceled);
+    expect(outcome).toEqual(Outcome.Canceled);
   });
 
   it("ignores IOs which cancel themselves as long as one finishes", async () => {
@@ -231,7 +231,7 @@ describe("The IO.race function", () => {
       IO.cancel().delay(5, "milliseconds"),
     ]);
     const outcome = await io.runSafe();
-    expect(outcome).toEqual(IOResult.Succeeded("result"));
+    expect(outcome).toEqual(Outcome.Succeeded("result"));
   });
 
   it("cancels the child fibers if the calling fiber is canceled", async () => {
@@ -273,7 +273,7 @@ describe("The IO.race function", () => {
   it("raises a runtime type error if called with an empty array", async () => {
     const io = IO.race([]);
     const outcome = await io.runSafe();
-    expect(outcome).toEqual(IOResult.Raised(expect.any(TypeError)));
+    expect(outcome).toEqual(Outcome.Raised(expect.any(TypeError)));
   });
 });
 

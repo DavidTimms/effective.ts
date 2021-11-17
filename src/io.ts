@@ -22,27 +22,27 @@ export enum OutcomeKind {
   Canceled,
 }
 
-export type IOResult<A, E> =
+export type Outcome<A, E> =
   | { kind: OutcomeKind.Succeeded; value: A }
   | { kind: OutcomeKind.Raised; value: E }
   | { kind: OutcomeKind.Canceled };
 
-export const IOResult = {
-  Succeeded<A>(value: A): IOResult<A, never> {
+export const Outcome = {
+  Succeeded<A>(value: A): Outcome<A, never> {
     return { kind: OutcomeKind.Succeeded, value };
   },
-  Raised<E>(value: E): IOResult<never, E> {
+  Raised<E>(value: E): Outcome<never, E> {
     return { kind: OutcomeKind.Raised, value };
   },
   Canceled: { kind: OutcomeKind.Canceled } as const,
 
-  toIO<A, E>(result: IOResult<A, E>): IO<A, E> {
-    switch (result.kind) {
+  toIO<A, E>(outcome: Outcome<A, E>): IO<A, E> {
+    switch (outcome.kind) {
       case OutcomeKind.Succeeded:
-        return IO.wrap(result.value);
+        return IO.wrap(outcome.value);
 
       case OutcomeKind.Raised:
-        return IO.raise(result.value);
+        return IO.raise(outcome.value);
 
       case OutcomeKind.Canceled:
         return IO.cancel();
@@ -82,21 +82,21 @@ export const RetryOptions: {
 };
 
 abstract class IOBase<A, E = unknown> {
-  protected abstract executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>>;
+  protected abstract executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>>;
 
-  async runSafe(this: IO<A, E>): Promise<IOResult<A, E>> {
+  async runSafe(this: IO<A, E>): Promise<Outcome<A, E>> {
     return new Fiber(this)["promise"];
   }
 
   async run(this: IO<A, E>): Promise<A> {
-    const result = await this.runSafe();
+    const outcome = await this.runSafe();
 
-    switch (result.kind) {
+    switch (outcome.kind) {
       case OutcomeKind.Succeeded:
-        return result.value;
+        return outcome.value;
 
       case OutcomeKind.Raised:
-        throw result.value;
+        throw outcome.value;
 
       case OutcomeKind.Canceled:
         throw new CancellationError();
@@ -157,7 +157,7 @@ abstract class IOBase<A, E = unknown> {
     return Fiber.start(raiseTimeout).andThen((timeoutFiber) =>
       IO.race([
         this.onCancel(timeoutFiber.cancel()),
-        timeoutFiber.outcome().andThen(IOResult.toIO),
+        timeoutFiber.outcome().andThen(Outcome.toIO),
       ])
     );
   }
@@ -206,8 +206,8 @@ class Wrap<A, E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(): Promise<IOResult<A, E>> {
-    return IOResult.Succeeded(this.value);
+  protected async executeOn(): Promise<Outcome<A, E>> {
+    return Outcome.Succeeded(this.value);
   }
 }
 
@@ -221,7 +221,7 @@ class Defer<A, E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>> {
     const effect = this.effect;
 
     return new Promise(async (resolve) => {
@@ -236,16 +236,16 @@ class Defer<A, E> extends IOBase<A, E> {
             // If the cancel function throws, the IO outcome is "raised"
             // instead of "canceled". This stops cancellation errors from
             // being silently ignored.
-            resolve(IOResult.Raised(e as E));
+            resolve(Outcome.Raised(e as E));
           }
-          resolve(IOResult.Canceled);
+          resolve(Outcome.Canceled);
         };
         const value = await promise;
         fiber["cancelCurrentEffect"] = previousCancelCurrentEffect;
-        resolve(IOResult.Succeeded(value));
+        resolve(Outcome.Succeeded(value));
       } catch (e: unknown) {
         fiber["cancelCurrentEffect"] = previousCancelCurrentEffect;
-        resolve(IOResult.Raised(e as E));
+        resolve(Outcome.Raised(e as E));
       }
     });
   }
@@ -259,7 +259,7 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>> {
     // TODO attempt to find a way to implement this function
     //      with type safety.
 
@@ -268,11 +268,11 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     // Trampoline the andThen operation to ensure stack safety.
     while (io instanceof AndThen) {
       const { next, parent } = io as AndThen<any, any, any, any>;
-      const result = await fiber._execute(parent);
-      if (result.kind === OutcomeKind.Succeeded) {
-        io = next(result.value);
+      const outcome = await fiber._execute(parent);
+      if (outcome.kind === OutcomeKind.Succeeded) {
+        io = next(outcome.value);
       } else {
-        return result;
+        return outcome;
       }
     }
     return fiber._execute(io);
@@ -284,8 +284,8 @@ class Raise<A, E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(): Promise<IOResult<A, E>> {
-    return IOResult.Raised(this.error);
+  protected async executeOn(): Promise<Outcome<A, E>> {
+    return Outcome.Raised(this.error);
   }
 }
 
@@ -300,7 +300,7 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
     super();
   }
 
-  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>> {
     const parentResult = await fiber._execute(this.parent);
     if (parentResult.kind === OutcomeKind.Raised) {
       const catcher = this.catcher;
@@ -312,8 +312,8 @@ class Catch<A, E, ParentA extends A, CaughtA extends A, ParentE> extends IOBase<
 }
 
 class Cancel<A, E> extends IOBase<A, E> {
-  protected async executeOn(): Promise<IOResult<A, E>> {
-    return IOResult.Canceled;
+  protected async executeOn(): Promise<Outcome<A, E>> {
+    return Outcome.Canceled;
   }
 }
 
@@ -328,7 +328,7 @@ class OnCancel<A, E, ParentE extends E, HandlerE extends E> extends IOBase<
     super();
   }
 
-  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>> {
     const parentOutcome = await fiber._execute(this.parent);
     if (parentOutcome.kind === OutcomeKind.Canceled) {
       const handlerOutcome = await fiber._execute(this.cancellationHandler);
@@ -346,7 +346,7 @@ class Uncancelable<A, E> extends IOBase<A, E> {
     super();
   }
 
-  protected async executeOn(fiber: Fiber<A, E>): Promise<IOResult<A, E>> {
+  protected async executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>> {
     const previousCancelCurrentEffect = fiber["cancelCurrentEffect"];
     let wasCanceled = false;
 
@@ -358,9 +358,9 @@ class Uncancelable<A, E> extends IOBase<A, E> {
       };
 
       // Run the action on a separate fiber.
-      const result = await this.action.runSafe();
+      const outcome = await this.action.runSafe();
 
-      return wasCanceled ? IOResult.Canceled : result;
+      return wasCanceled ? Outcome.Canceled : outcome;
     } finally {
       fiber["cancelCurrentEffect"] = previousCancelCurrentEffect;
     }
@@ -385,7 +385,7 @@ class Bracket<
 
   protected async executeOn(
     fiber: Fiber
-  ): Promise<IOResult<A, EOpen | EClose | EUse>> {
+  ): Promise<Outcome<A, EOpen | EClose | EUse>> {
     const { open, close, use } = this;
 
     const openOutcome = await fiber._execute(open);
@@ -504,7 +504,7 @@ function parallel<Actions extends IOArray>(
   function startNextActionFiber(
     previousFibers: Fiber[],
     index: number
-  ): IO<IOResult<unknown, unknown>[], never> {
+  ): IO<Outcome<unknown, unknown>[], never> {
     if (index >= actions.length) {
       return startEarlyCancellationFibers(previousFibers);
     } else {
@@ -522,7 +522,7 @@ function parallel<Actions extends IOArray>(
   // of the first, and cancels the other fibers if it raises or cancels.
   function startEarlyCancellationFibers(
     fibers: Fiber[]
-  ): IO<IOResult<unknown, unknown>[], never> {
+  ): IO<Outcome<unknown, unknown>[], never> {
     return IO.sequence(
       fibers.map((fiber) =>
         Fiber.start(
@@ -538,7 +538,7 @@ function parallel<Actions extends IOArray>(
     )
       .andThen((cancellationFibers) =>
         IO.sequence(
-          cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
+          cancellationFibers.map((f) => f.outcome().andThen(Outcome.toIO))
         )
       )
       .onCancel(cancelAll(fibers));
@@ -626,21 +626,21 @@ function race<Actions extends IOArray>(
   // of the first, and cancels the other fibers if it raises or succeeds.
   function startEarlyCancellationFibers(
     fibers: Fiber<UnionOfValues<Actions>, UnionOfErrors<Actions>>[]
-  ): IO<IOResult<UnionOfValues<Actions>, UnionOfErrors<Actions>>[], never> {
+  ): IO<Outcome<UnionOfValues<Actions>, UnionOfErrors<Actions>>[], never> {
     return IO.sequence(
       fibers.map((fiber) =>
         Fiber.start(
           fiber
             .outcome()
             .through((outcome) =>
-              outcome === IOResult.Canceled ? IO.void : cancelAll(fibers)
+              outcome === Outcome.Canceled ? IO.void : cancelAll(fibers)
             )
         )
       )
     )
       .andThen((cancellationFibers) =>
         IO.sequence(
-          cancellationFibers.map((f) => f.outcome().andThen(IOResult.toIO))
+          cancellationFibers.map((f) => f.outcome().andThen(Outcome.toIO))
         )
       )
       .onCancel(cancelAll(fibers));
@@ -648,7 +648,7 @@ function race<Actions extends IOArray>(
 
   return startNextActionFiber([], 0)
     .andThen(findFirstFinishedOutcome)
-    .andThen(IOResult.toIO);
+    .andThen(Outcome.toIO);
 }
 
 function cancelAll(fibers: Fiber<unknown, unknown>[]): IO<void, never> {
@@ -662,14 +662,14 @@ function cancelAll(fibers: Fiber<unknown, unknown>[]): IO<void, never> {
 function findFirstFinishedOutcome<A, E>(
   fibers: Fiber<A, E>[],
   index = 0
-): IO<IOResult<A, E>, never> {
+): IO<Outcome<A, E>, never> {
   if (index >= fibers.length) {
     return IO.cancel();
   }
   return fibers[index]
     .outcome()
     .andThen((outcome) =>
-      outcome === IOResult.Canceled
+      outcome === Outcome.Canceled
         ? findFirstFinishedOutcome(fibers, index + 1)
         : IO.wrap(outcome)
     );

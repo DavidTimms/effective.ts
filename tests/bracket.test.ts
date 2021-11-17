@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import IO, { Fiber, IOResult } from "../src/io";
+import IO, { Fiber, Outcome } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The IO.bracket function", () => {
@@ -96,7 +96,7 @@ describe("The IO.bracket function", () => {
       .andThen((fiber) => fiber.outcome());
 
     const outcome = await io.run();
-    expect(outcome).toEqual(IOResult.Canceled);
+    expect(outcome).toEqual(Outcome.Canceled);
     expect(use).not.toHaveBeenCalled();
     expect(close).not.toHaveBeenCalled();
   });
@@ -111,7 +111,7 @@ describe("The IO.bracket function", () => {
       .andThen((fiber) => fiber.outcome());
 
     const outcome = await io.run();
-    expect(outcome).toEqual(IOResult.Canceled);
+    expect(outcome).toEqual(Outcome.Canceled);
     expect(close).toHaveBeenCalled();
   });
 
@@ -125,6 +125,6 @@ describe("The IO.bracket function", () => {
       .andThen((fiber) => fiber.outcome());
 
     const outcome = await io.run();
-    expect(outcome).toEqual(IOResult.Canceled);
+    expect(outcome).toEqual(Outcome.Canceled);
   });
 });

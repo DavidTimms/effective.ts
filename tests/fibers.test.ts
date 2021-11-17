@@ -1,4 +1,4 @@
-import { Fiber, IO, IOResult } from "../src/io";
+import { Fiber, IO, Outcome } from "../src/io";
 
 describe("The Fiber.start function", () => {
   it("return an IO which runs the provided IO in an fiber, without blocking", async () => {
@@ -56,7 +56,7 @@ describe("The Fiber.outcome method", () => {
       fiber.outcome()
     );
 
-    await expect(io.run()).resolves.toEqual(IOResult.Succeeded("success"));
+    await expect(io.run()).resolves.toEqual(Outcome.Succeeded("success"));
   });
 
   it("returns an IO which produces the fiber's outcome if the fiber raises an error", async () => {
@@ -64,13 +64,13 @@ describe("The Fiber.outcome method", () => {
       fiber.outcome()
     );
 
-    await expect(io.run()).resolves.toEqual(IOResult.Raised("error"));
+    await expect(io.run()).resolves.toEqual(Outcome.Raised("error"));
   });
 
   it("returns an IO which produces the fiber's outcome if the fiber is canceled", async () => {
     const io = Fiber.start(IO.cancel()).andThen((fiber) => fiber.outcome());
 
-    await expect(io.run()).resolves.toEqual(IOResult.Canceled);
+    await expect(io.run()).resolves.toEqual(Outcome.Canceled);
   });
 });
 
@@ -101,7 +101,7 @@ describe("The Fiber.cancel method", () => {
 
     const outcome = await io.runSafe();
 
-    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Canceled));
+    expect(outcome).toEqual(Outcome.Succeeded(Outcome.Canceled));
   });
 
   it("does not affect the outcome of the fiber if it has already succeeded", async () => {
@@ -113,7 +113,7 @@ describe("The Fiber.cancel method", () => {
 
     const outcome = await io.runSafe();
 
-    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Succeeded(123)));
+    expect(outcome).toEqual(Outcome.Succeeded(Outcome.Succeeded(123)));
   });
 
   it("does not affect the outcome of the fiber if it has already succeeded with an async step", async () => {
@@ -126,7 +126,7 @@ describe("The Fiber.cancel method", () => {
 
     const outcome = await io.runSafe();
 
-    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Succeeded(123)));
+    expect(outcome).toEqual(Outcome.Succeeded(Outcome.Succeeded(123)));
   });
 
   it("does not affect the outcome of the fiber if it has already raised", async () => {
@@ -138,7 +138,7 @@ describe("The Fiber.cancel method", () => {
 
     const outcome = await io.runSafe();
 
-    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Raised("an error")));
+    expect(outcome).toEqual(Outcome.Succeeded(Outcome.Raised("an error")));
   });
 
   it("has no effect if the fiber is already canceled", async () => {
@@ -151,6 +151,6 @@ describe("The Fiber.cancel method", () => {
 
     const outcome = await io.runSafe();
 
-    expect(outcome).toEqual(IOResult.Succeeded(IOResult.Canceled));
+    expect(outcome).toEqual(Outcome.Succeeded(Outcome.Canceled));
   });
 });

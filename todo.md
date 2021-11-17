@@ -55,7 +55,7 @@
 - [ ] work out how to split into several modules
 - [x] replace `IOInterface` and `methods` object with abstract base class
 - [ ] Use consistent terminology throughout - e.g. IO vs action vs effect
-- [ ] Rename `IOResult` to `Outcome` or `IOOutcome` and `IOOutcome` to `OutcomeKind`
+- [x] Rename `IOResult` to `Outcome` or `IOOutcome` and `IOOutcome` to `OutcomeKind`
 - [ ] Refactor `IO` implementation to take `executeOn` as a private member rather than using inheritance. This may make type errors easier to understand by removing the massive union type.
 - [ ] Remove duplication between implementations of IO.race and IO.parallel.
 
