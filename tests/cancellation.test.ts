@@ -1,12 +1,12 @@
 import fc from "fast-check";
 import { CancellationError } from "../src/errors";
-import IO, { Fiber, IOOutcome, IOResult } from "../src/io";
+import IO, { Fiber, OutcomeKind, IOResult } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The IO.cancel function", () => {
   it("gives an IO which results in the 'canceled' outcome", async () => {
     const result = await IO.cancel().runSafe();
-    expect(result).toEqual({ outcome: IOOutcome.Canceled });
+    expect(result).toEqual({ kind: OutcomeKind.Canceled });
   });
 
   it("gives an IO which throws a CancellationError if run directly", async () => {

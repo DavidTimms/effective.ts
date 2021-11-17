@@ -1,5 +1,5 @@
 import fc from "fast-check";
-import { IOOutcome } from "../src/io";
+import { OutcomeKind } from "../src/io";
 import * as arbitraries from "./arbitraries";
 
 describe("The through method", () => {
@@ -18,7 +18,7 @@ describe("The through method", () => {
 
           expect(resultThroughAdditionalIo).toEqual(firstIoResult);
 
-          if (firstIoResult.outcome === IOOutcome.Succeeded) {
+          if (firstIoResult.kind === OutcomeKind.Succeeded) {
             expect(throughFunc).toHaveBeenCalledTimes(1);
             expect(throughFunc).toHaveBeenCalledWith(firstIoResult.value);
           } else {
