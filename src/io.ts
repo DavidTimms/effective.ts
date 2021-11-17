@@ -5,16 +5,7 @@ import { Ref } from "./ref";
 export { TimeoutError };
 export { Fiber };
 
-export type IO<A, E = unknown> =
-  | Wrap<A, E>
-  | Defer<A, E>
-  | AndThen<A, E, any, E>
-  | Raise<A, E>
-  | Catch<A, E, any, any, any>
-  | Cancel<A, E>
-  | OnCancel<A, E, any, any>
-  | Uncancelable<A, E>
-  | Bracket<A, E, any, any, any, any>;
+export type IO<A, E = unknown> = IOBase<A, E>;
 
 export enum OutcomeKind {
   Succeeded,
