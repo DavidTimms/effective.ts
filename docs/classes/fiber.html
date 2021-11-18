@@ -98,16 +98,12 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="fiber.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="fiber.html#promise" class="tsd-kind-icon">promise</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static"><a href="fiber.html#nextid" class="tsd-kind-icon">next<wbr>Id</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="fiber.html#_execute" class="tsd-kind-icon">_execute</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="fiber.html#cancel" class="tsd-kind-icon">cancel</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="fiber.html#cancelcurrenteffect" class="tsd-kind-icon">cancel<wbr>Current<wbr>Effect</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="fiber.html#outcome" class="tsd-kind-icon">outcome</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-static"><a href="fiber.html#start" class="tsd-kind-icon">start</a></li>
 							</ul>
@@ -127,7 +123,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L11">src/fiber.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/90d2c29/src/fiber.ts#L11">src/fiber.ts:11</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -158,65 +154,13 @@
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L8">src/fiber.ts:8</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="promise" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagReadonly">Readonly</span> promise</h3>
-					<div class="tsd-signature tsd-kind-icon">promise<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules.html#outcome" class="tsd-signature-type" data-tsd-kind="Variable">Outcome</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L11">src/fiber.ts:11</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
-					<a name="nextid" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> next<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">next<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L7">src/fiber.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/90d2c29/src/fiber.ts#L8">src/fiber.ts:8</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-					<a name="_execute" class="tsd-anchor"></a>
-					<h3>_execute</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">_execute&lt;A2, E2&gt;<span class="tsd-signature-symbol">(</span>action<span class="tsd-signature-symbol">: </span><a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A2</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E2</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules.html#outcome" class="tsd-signature-type" data-tsd-kind="Variable">Outcome</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A2</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E2</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L22">src/fiber.ts:22</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-type-parameters-title">Type parameters</h4>
-							<ul class="tsd-type-parameters">
-								<li>
-									<h4>A2</h4>
-								</li>
-								<li>
-									<h4>E2</h4>
-								</li>
-							</ul>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>action: <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A2</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E2</span><span class="tsd-signature-symbol">&gt;</span></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules.html#outcome" class="tsd-signature-type" data-tsd-kind="Variable">Outcome</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A2</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E2</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
 					<a name="cancel" class="tsd-anchor"></a>
 					<h3>cancel</h3>
@@ -227,27 +171,10 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L33">src/fiber.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/90d2c29/src/fiber.ts#L36">src/fiber.ts:36</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
-					<a name="cancelcurrenteffect" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> cancel<wbr>Current<wbr>Effect</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
-						<li class="tsd-signature tsd-kind-icon">cancel<wbr>Current<wbr>Effect<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L10">src/fiber.ts:10</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -261,7 +188,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L27">src/fiber.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/90d2c29/src/fiber.ts#L30">src/fiber.ts:30</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../modules.html#io" class="tsd-signature-type" data-tsd-kind="Function">IO</a><span class="tsd-signature-symbol">&lt;</span><a href="../modules.html#outcome" class="tsd-signature-type" data-tsd-kind="Variable">Outcome</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">never</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -278,7 +205,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/fiber.ts#L18">src/fiber.ts:18</a></li>
+									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/90d2c29/src/fiber.ts#L18">src/fiber.ts:18</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -329,20 +256,8 @@
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="fiber.html#id" class="tsd-kind-icon">id</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="fiber.html#promise" class="tsd-kind-icon">promise</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static">
-								<a href="fiber.html#nextid" class="tsd-kind-icon">next<wbr>Id</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
-								<a href="fiber.html#_execute" class="tsd-kind-icon">_execute</a>
-							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="fiber.html#cancel" class="tsd-kind-icon">cancel</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
-								<a href="fiber.html#cancelcurrenteffect" class="tsd-kind-icon">cancel<wbr>Current<wbr>Effect</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="fiber.html#outcome" class="tsd-kind-icon">outcome</a>
@@ -391,13 +306,6 @@
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
 			</ul>
 		</div>
 	</div>

@@ -19,6 +19,9 @@ export class Fiber<A = unknown, E = unknown> {
     return IO(() => new Fiber(action)).castError<never>();
   }
 
+  /**
+   * @hidden
+   */
   async _execute<A2, E2>(action: IO<A2, E2>): Promise<Outcome<A2, E2>> {
     // Horrible type-cast needed to call the private executeOn method.
     return (action as any).executeOn(this);

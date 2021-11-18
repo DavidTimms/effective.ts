@@ -71,3 +71,11 @@
 - [ ] some more helper methods for composing independent IOs and returning the first or second value
 - [ ] overload `andThen` to take an `IO` instead of a `() => IO`
 - [ ] Support for partial functions in catch and andThen?
+
+### Documentation and Release
+
+- [x] Set up documentation generator.
+- [ ] Publish docs to GitHub pages.
+- [ ] Add "Getting Started" guide to the readme.
+- [ ] Ensure all important methods and functions have doc comments.
+- [ ] Publish to NPM.
