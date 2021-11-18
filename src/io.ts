@@ -5,16 +5,7 @@ import { Ref } from "./ref";
 export { TimeoutError };
 export { Fiber };
 
-export type IO<A, E = unknown> =
-  | Wrap<A, E>
-  | Defer<A, E>
-  | AndThen<A, E, any, E>
-  | Raise<A, E>
-  | Catch<A, E, any, any, any>
-  | Cancel<A, E>
-  | OnCancel<A, E, any, any>
-  | Uncancelable<A, E>
-  | Bracket<A, E, any, any, any, any>;
+export type IO<A, E = unknown> = IOBase<A, E>;
 
 export enum OutcomeKind {
   Succeeded,
@@ -263,19 +254,19 @@ class AndThen<A, E, ParentA, ParentE extends E> extends IOBase<A, E> {
     // TODO attempt to find a way to implement this function
     //      with type safety.
 
-    let io: IO<A, E> = this;
+    let action: IO<A, E> = this;
 
     // Trampoline the andThen operation to ensure stack safety.
-    while (io instanceof AndThen) {
-      const { next, parent } = io as AndThen<any, any, any, any>;
+    while (action instanceof AndThen) {
+      const { next, parent } = action as AndThen<any, any, any, any>;
       const outcome = await fiber._execute(parent);
       if (outcome.kind === OutcomeKind.Succeeded) {
-        io = next(outcome.value);
+        action = next(outcome.value);
       } else {
         return outcome;
       }
     }
-    return fiber._execute(io);
+    return fiber._execute(action);
   }
 }
 
@@ -463,9 +454,9 @@ type ValuesArray<Actions extends IOArray> = {
 };
 
 /**
- * Creates an IO from an array of IOs, which will perform
- * the actions sequentially, returning an array of the results,
- * or stopping on the first error encountered.
+ * Creates a single action from an array of actions, which will perform
+ * the actions sequentially, returning an array of the results, or
+ * stopping on the first error encountered.
  */
 function sequence<Actions extends IOArray>(
   actions: Actions
@@ -491,9 +482,10 @@ function sequenceFrom<Actions extends IOArray>(
 }
 
 /**
- * Creates an IO from an array of IOs, which will perform
- * the actions concurrently, returning an array of the results,
- * or stopping when the first error occurs.
+ * Creates a single from an array of actions, which will perform
+ * the actions concurrently, returning an array of the results.
+ * If any of the actions cancel or raise an error, all other
+ * actions are immediately canceled.
  */
 function parallel<Actions extends IOArray>(
   actions: Actions
