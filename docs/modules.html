@@ -124,10 +124,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter">
 					<a name="io" class="tsd-anchor"></a>
 					<h3>IO</h3>
-					<div class="tsd-signature tsd-kind-icon">IO&lt;A, E&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Wrap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Defer</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">AndThen</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Raise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Catch</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Cancel</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OnCancel</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Uncancelable</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Bracket</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">IO&lt;A, E&gt;<span class="tsd-signature-symbol">:</span> <a href="classes/iobase.html" class="tsd-signature-type" data-tsd-kind="Class">IOBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L8">src/io.ts:8</a></li>
+							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L8">src/io.ts:8</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -146,7 +146,7 @@
 					<div class="tsd-signature tsd-kind-icon">Outcome&lt;A, E&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><a href="enums/outcomekind.html#succeeded" class="tsd-signature-type" data-tsd-kind="Enumeration member">Succeeded</a><span class="tsd-signature-symbol">; </span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">A</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><a href="enums/outcomekind.html#raised" class="tsd-signature-type" data-tsd-kind="Enumeration member">Raised</a><span class="tsd-signature-symbol">; </span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><a href="enums/outcomekind.html#canceled" class="tsd-signature-type" data-tsd-kind="Enumeration member">Canceled</a><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L25">src/io.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L16">src/io.ts:16</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -165,7 +165,7 @@
 					<div class="tsd-signature tsd-kind-icon">Retry<wbr>Options&lt;E&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>backoff<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>count<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>delay<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Duration</span><span class="tsd-signature-symbol">; </span>filter<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">E</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L53">src/io.ts:53</a></li>
+							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L44">src/io.ts:44</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -240,7 +240,7 @@
 					<div class="tsd-signature tsd-kind-icon">Outcome<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>Canceled<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>kind<span class="tsd-signature-symbol">: </span><a href="enums/outcomekind.html#canceled" class="tsd-signature-type" data-tsd-kind="Enumeration member">Canceled</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>Raised<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>Succeeded<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>toIO<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L30">src/io.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L21">src/io.ts:21</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -263,7 +263,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L34">src/io.ts:34</a></li>
+												<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L25">src/io.ts:25</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -291,7 +291,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L31">src/io.ts:31</a></li>
+												<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L22">src/io.ts:22</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -319,7 +319,7 @@
 									<li class="tsd-description">
 										<aside class="tsd-sources">
 											<ul>
-												<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L39">src/io.ts:39</a></li>
+												<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L30">src/io.ts:30</a></li>
 											</ul>
 										</aside>
 										<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -350,7 +350,7 @@
 					<div class="tsd-signature tsd-kind-icon">Retry<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>defaults<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Required</span><span class="tsd-signature-symbol">&lt;</span><a href="modules.html#retryoptions" class="tsd-signature-type" data-tsd-kind="Variable">RetryOptions</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;count&quot;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L74">src/io.ts:74</a></li>
+							<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L65">src/io.ts:65</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -375,7 +375,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/a4b7241/src/io.ts#L409">src/io.ts:409</a></li>
+									<li>Defined in <a href="https://github.com/DavidTimms/effective/blob/76c4401/src/io.ts#L400">src/io.ts:400</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>

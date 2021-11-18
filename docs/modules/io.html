@@ -390,9 +390,10 @@
 									<li class="tsd-description">
 										<div class="tsd-comment tsd-typography">
 											<div class="lead">
-												<p>Creates an IO from an array of IOs, which will perform
-													the actions concurrently, returning an array of the results,
-												or stopping when the first error occurs.</p>
+												<p>Creates a single from an array of actions, which will perform
+													the actions concurrently, returning an array of the results.
+													If any of the actions cancel or raise an error, all other
+												actions are immediately canceled.</p>
 											</div>
 										</div>
 										<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -506,9 +507,9 @@
 									<li class="tsd-description">
 										<div class="tsd-comment tsd-typography">
 											<div class="lead">
-												<p>Creates an IO from an array of IOs, which will perform
-													the actions sequentially, returning an array of the results,
-												or stopping on the first error encountered.</p>
+												<p>Creates a single action from an array of actions, which will perform
+													the actions sequentially, returning an array of the results, or
+												stopping on the first error encountered.</p>
 											</div>
 										</div>
 										<h4 class="tsd-type-parameters-title">Type parameters</h4>
