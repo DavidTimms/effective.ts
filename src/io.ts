@@ -72,7 +72,7 @@ export const RetryOptions: {
   },
 };
 
-abstract class IOBase<A, E = unknown> {
+export abstract class IOBase<A, E = unknown> {
   protected abstract executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>>;
 
   async runSafe(this: IO<A, E>): Promise<Outcome<A, E>> {
@@ -723,9 +723,12 @@ IO.wait = wait;
 IO.bracket = bracket;
 IO.uncancelable = uncancelable;
 
-// This alias for setTimeout is used instead of calling the
-// global directly, so it can be replaced with intercepting
-// implementations in tests.
+/**
+ * @hidden
+ * This alias for setTimeout is used instead of calling the
+ * global directly, so it can be replaced with intercepting
+ * implementations in tests.
+ */
 IO._setTimeout = setTimeout;
 
 export default IO;

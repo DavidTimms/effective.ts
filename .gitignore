@@ -134,3 +134,6 @@ scratchpad/
 
 # Editor settings
 .vscode/
+
+# Generated documentation
+docs/
