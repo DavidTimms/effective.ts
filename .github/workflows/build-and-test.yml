@@ -22,7 +22,7 @@ jobs:
       - name: Generate documentation
         run: npm run generate-docs
       - name: Deploy documentation to GitHub Pages
-        if: github.ref == 'refs/heads/documentation'
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
