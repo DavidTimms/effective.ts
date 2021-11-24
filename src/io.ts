@@ -2,9 +2,17 @@ import { CancellationError, TimeoutError } from "./errors";
 import { Fiber } from "./fiber";
 import { Ref } from "./ref";
 
-export { TimeoutError };
-export { Fiber };
+export { CancellationError, TimeoutError, Fiber, Ref };
 
+/**
+ * This is the primary type in the library. It represents an action
+ * which returns a value of type `A`, or raises an error of type `E`.
+ * The action may perform side effects and wait asynchronously. Any
+ * asynchronous or impure function should return this type.
+ *
+ * @typeParam A - the type of values returned by this action.
+ * @typeParam E - the type of errors raised by this action.
+ */
 export type IO<A, E = unknown> = IOBase<A, E>;
 
 export enum OutcomeKind {
@@ -13,6 +21,15 @@ export enum OutcomeKind {
   Canceled,
 }
 
+/**
+ * An object containing the result of running an action (IO). It
+ * will either have succeeded with a value of type `A`, raise an
+ * error of type `E`, or been canceled, in which case it will not
+ * contain a value.
+ *
+ * @typeParam A - the type of values returned if the action succeeds.
+ * @typeParam E - the type of errors raised if the action fails.
+ */
 export type Outcome<A, E> =
   | { kind: OutcomeKind.Succeeded; value: A }
   | { kind: OutcomeKind.Raised; value: E }
@@ -41,6 +58,9 @@ export const Outcome = {
   },
 };
 
+/**
+ * Options for controlling the behaviour of the [[`retry`]] method.
+ */
 export type RetryOptions<E = unknown> = {
   /** The number of times to retry. */
   count: number;
@@ -75,10 +95,29 @@ export const RetryOptions: {
 export abstract class IOBase<A, E = unknown> {
   protected abstract executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>>;
 
+  /**
+   * Run this action, performing any side-effects, and return an object
+   * representing the outcome. If the action raises an error or cancels,
+   * the returned promise will still resolve. If you want to throw errors,
+   * use [[`run`]] instead.
+   *
+   * You should ideally only call this once at the top level of your
+   * program, or when frameworks need to interoperate with code using
+   * [[`IO`]].
+   */
   async runSafe(this: IO<A, E>): Promise<Outcome<A, E>> {
     return new Fiber(this)["promise"];
   }
 
+  /**
+   * Run this action, performing any side-effects, and return the result.
+   * If the action raises an error, it is thrown. It the action cancels,
+   * a [[`CancellationError`]] is thrown.
+   *
+   * You should ideally only call this once at the top level of your
+   * program, or when frameworks need to interoperate with code using
+   * [[`IO`]].
+   */
   async run(this: IO<A, E>): Promise<A> {
     const outcome = await this.runSafe();
 
@@ -154,7 +193,31 @@ export abstract class IOBase<A, E = unknown> {
   }
 
   /**
-   * Re-run the IO if it raises an error, up to the given number of times.
+   * Re-run the IO if it raises an error, up to the given number of times. By
+   * default, the action is retried immediately. A [[`RetryOptions`]] object
+   * may be provided for more advanced use cases, such as exponential backoff.
+   * A filter function can be used to only retry certain types of error.
+   *
+   * ### Examples
+   * ```ts
+   * const action = IO(() => fs.promises.readFile("./readme.md"));
+   *
+   * // Retry once if the first attempt fails.
+   * action.retry(1);
+   *
+   * // Retry 3 times, after 1 second, then 2 seconds, then 4 seconds.
+   * action.retry({
+   *   count: 3,
+   *   delay: [1, 'second'],
+   *   backoff: 2,
+   * });
+   *
+   * // Retry only if the file does not exist.
+   * action.retry({
+   *   count: 1,
+   *   filter: (error: any) => error.code === 'ENOENT'
+   * });
+   * ```
    **/
   retry(this: IO<A, E>, retryCount: number): IO<A, E>;
   retry(this: IO<A, E>, options: RetryOptions<E>): IO<A, E>;

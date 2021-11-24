@@ -21,7 +21,8 @@
     "test": "jest --maxWorkers 2",
     "lint": "prettier --check 'src/**.ts' 'tests/**.ts'",
     "prepare": "npm run build",
-    "generate-docs": "tsc --project docs-generator && typedoc --plugin ./docs-generator/dist/typedoc-effective-plugin.js src/io.ts",
+    "generate-docs": "tsc --project docs-generator && typedoc --plugin ./docs-generator/dist/typedoc-effective-plugin.js src/*",
+    "generate-docs-watch": "tsc --project docs-generator && typedoc --plugin ./docs-generator/dist/typedoc-effective-plugin.js --watch src/*",
     "prepublishOnly": "npm test",
     "postversion": "git push && git push --tags"
   },

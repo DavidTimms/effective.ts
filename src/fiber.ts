@@ -5,7 +5,7 @@ const TRACE_FIBERS = false;
 export class Fiber<A = unknown, E = unknown> {
   // Assign each fiber a unique ID for debugging.
   private static nextId = 0;
-  id = Fiber.nextId++;
+  private id = Fiber.nextId++;
 
   private cancelCurrentEffect = () => {};
   private readonly promise: Promise<Outcome<A, E>>;
