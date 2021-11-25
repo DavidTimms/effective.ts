@@ -10,7 +10,7 @@
     "typescript": "^4.4.4"
   },
   "name": "effective.ts",
-  "description": "A library for writing safe, concurrent, fault-tolerant programs in TypeScript",
+  "description": "A library for writing safe, concurrent, fault-tolerant programs in TypeScript.",
   "version": "0.1.0",
   "main": "dist/io.js",
   "types": "dist/io.d.ts",
@@ -40,7 +40,7 @@
     "fault-tolerant"
   ],
   "author": "David Timms",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "sideEffects": false,
   "bugs": {
     "url": "https://github.com/DavidTimms/effective.ts/issues"
