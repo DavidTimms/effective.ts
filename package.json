@@ -11,7 +11,7 @@
   },
   "name": "effective.ts",
   "description": "A library for writing safe, concurrent, fault-tolerant programs in TypeScript.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "main": "dist/io.js",
   "types": "dist/io.d.ts",
   "files": [
