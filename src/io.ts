@@ -165,6 +165,10 @@ export abstract class IOBase<A, E = unknown> {
     return this.andThen(() => wrappedValue);
   }
 
+  get void(): IO<void, E> {
+    return this.as(void 0);
+  }
+
   repeatForever(this: IO<A, E>): IO<never, E> {
     return this.andThen(() => this.repeatForever());
   }
