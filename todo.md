@@ -75,7 +75,7 @@
 ### Documentation and Release
 
 - [x] Set up documentation generator.
-- [ ] Publish docs to GitHub pages.
+- [x] Publish docs to GitHub pages.
 - [ ] Add "Getting Started" guide to the readme.
 - [ ] Ensure all important methods and functions have doc comments.
-- [ ] Publish to NPM.
+- [x] Publish to NPM.
