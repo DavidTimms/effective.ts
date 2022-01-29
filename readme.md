@@ -19,3 +19,7 @@ A library for writing safe, concurrent, fault-tolerant programs in TypeScript.
 ## API Reference
 
 [API reference documentation is hosted here.](https://davidtimms.github.io/effective.ts/modules/io.html)
+
+## Cheat Sheet
+
+If you are already familiar with using the IO types in Haskell or Scala, [this cheat sheet should help you get up to speed with Effective.ts quickly.](https://github.com/DavidTimms/effective.ts/blob/main/cheatsheet.md)
