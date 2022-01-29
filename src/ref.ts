@@ -1,7 +1,7 @@
 import IO from "./io";
 
 export class Ref<A> {
-  constructor(private currentValue: A) {
+  private constructor(private currentValue: A) {
     this.get = IO(() => this.currentValue).castError<never>();
 
     this.set = (newValue: A) =>

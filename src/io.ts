@@ -93,6 +93,11 @@ export const RetryOptions: {
 };
 
 export abstract class IOBase<A, E = unknown> {
+  /**
+   * @hidden
+   */
+  constructor() {}
+
   protected abstract executeOn(fiber: Fiber<A, E>): Promise<Outcome<A, E>>;
 
   /**

@@ -10,6 +10,9 @@ export class Fiber<A = unknown, E = unknown> {
   private cancelCurrentEffect = () => {};
   private readonly promise: Promise<Outcome<A, E>>;
 
+  /**
+   * @hidden
+   */
   constructor(action: IO<A, E>) {
     if (TRACE_FIBERS) console.log(`starting fiber ${this.id}`);
     this.promise = this._execute(action);
